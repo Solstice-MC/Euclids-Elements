@@ -39,8 +39,11 @@ jobs:
                   version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
                   changelog: "${{ github.event.release.body }}"
             - name: Publish to Cloudsmith
-              uses: cloudsmith-io/action-upload@v1
+              uses: cloudsmith-io/action@master
               with:
                   api-key: ${{ secrets.CLOUDSMITH_API_KEY }}
+                  command: "push"
+                  format: "maven"
+                  owner: "solstice-mc"
+                  repo: "artifacts"
                   file: build/libs/*.jar
-                  repo: ${{ vars.CLOUDSMITH_REPO }}
