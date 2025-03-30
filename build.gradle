@@ -8,7 +8,6 @@ group = mod_group
 version = mod_version
 
 repositories {
-	maven { url 'https://maven.pkg.github.com/Solstice-mc' }
     maven { url 'https://maven.neoforged.net/releases' }
 }
 
@@ -39,15 +38,5 @@ publishing {
 			from components.java
 		}
 	}
-	repositories {
-		maven {
-			url = "https://maven.pkg.github.com/Solstice-MC/Euclids-Elements"
-			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
-	}
 }
-
 tasks.build.finalizedBy publishToMavenLocal
