@@ -1,0 +1,43 @@
+on:
+    release:
+        types: [published]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            packages: write
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v3
+            - name: Setup JDK
+              uses: actions/setup-java@v3
+              with:
+                  distribution: "temurin"
+                  java-version: 21
+                  cache: "gradle"
+#            - name: Change Version
+#              run: sed -i 's/mod_version=.*/mod_version=${{ github.event.release.tag_name }}/g' gradle.properties
+            - name: Build
+              run: ./gradlew clean build
+            - name: Publish to GitHub Packages
+              run: ./gradlew publish
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - name: Publish to Modrinth and Curseforge
+              uses: Kir-Antipov/mc-publish@v3.3
+              with:
+#                  curseforge-id: "${{ vars.CURSEFORGE_ID }}"
+#                  curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+#                  curseforge-version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
+                  modrinth-id: "${{ vars.MODRINTH_ID }}"
+                  modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+                  modrinth-version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
+                  github-tag: "${{ github.event.release.tag_name }}"
+                  github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+                  name: "${{ github.event.release.name }}"
+                  version: "${{ github.event.release.tag_name }}"
+                  version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
+                  changelog: "${{ github.event.release.body }}"
