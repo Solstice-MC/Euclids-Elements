@@ -1,10 +1,13 @@
 package org.solstice.euclidsElements.mixin;
 
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,18 +24,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableObject;
+import org.solstice.euclidsElements.api.effectHolder.EffectHolder;
 import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 @Mixin(EnchantmentHelper.class)
 public abstract class EnchantmentHelperMixin {
@@ -386,7 +395,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void applyAttributeModifiers(ItemStack stack, AttributeModifierSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> consumer) {
+	public static void applyAttributeModifiers(ItemStack stack, AttributeModifierSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, (effectHolder, level) ->
             effectHolder.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach(effect -> {
                 if (effectHolder.value().getDefinition().getSlots().contains(slot))
@@ -400,11 +409,11 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void applyAttributeModifiers(ItemStack stack, EquipmentSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> attributeModifierConsumer) {
+	public static void applyAttributeModifiers(ItemStack stack, EquipmentSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, (effectHolder, level) ->
             effectHolder.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach(effect -> {
                 if (effectHolder.value().slotMatches(slot))
-                    attributeModifierConsumer.accept(effect.attribute(), effect.createAttributeModifier(level, slot));
+                    consumer.accept(effect.attribute(), effect.createAttributeModifier(level, slot));
             }
         ));
     }
@@ -502,5 +511,26 @@ public abstract class EnchantmentHelperMixin {
         });
         return result.getValue();
     }
+
+	/**
+	 * @author Solstice
+	 * @reason Use EffectHolderHelper
+	 */
+	@Overwrite
+	public static Optional<EnchantmentEffectContext> chooseEquipmentWith(ComponentType<?> componentType, LivingEntity entity, Predicate<ItemStack> stackPredicate) {
+		List<EnchantmentEffectContext> result = new ArrayList<>();
+
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack stack = entity.getEquippedStack(slot);
+			if (!stackPredicate.test(stack)) continue;
+
+			EffectHolderHelper.forEachEffectHolder(stack, (effectHolder, level) -> {
+				if (effectHolder.value().getEffects().contains(componentType) && effectHolder.value().slotMatches(slot))
+					result.add(new EnchantmentEffectContext(stack, slot, entity));
+			});
+		}
+
+		return Util.getRandomOrEmpty(result, entity.getRandom());
+	}
 
 }

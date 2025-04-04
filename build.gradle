@@ -9,6 +9,7 @@ version = mod_version
 
 repositories {
     maven { url 'https://maven.neoforged.net/releases' }
+	mavenCentral()
 }
 
 dependencies {
@@ -36,6 +37,15 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
+		}
+	}
+	repositories {
+		maven {
+			url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
+			credentials {
+				username = project.findProperty("CLOUDSMITH_USERNAME") ?: System.getenv("CLOUDSMITH_USERNAME")
+				password = project.findProperty("CLOUDSMITH_API_KEY") ?: System.getenv("CLOUDSMITH_API_KEY")
+			}
 		}
 	}
 }

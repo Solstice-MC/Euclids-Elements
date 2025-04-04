@@ -84,7 +84,6 @@ public class EffectHolderHelper {
         }
     }
 
-
 	public static int getMaxDurability(ItemStack stack, int base) {
 		MutableFloat result = new MutableFloat(base);
 		forEachEffectHolder(stack, (effectHolder, level) ->
