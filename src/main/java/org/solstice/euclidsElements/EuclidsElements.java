@@ -20,6 +20,7 @@ public class EuclidsElements {
     public EuclidsElements(IEventBus bus) {
 		EuclidsComponentTypes.REGISTRY.register(bus);
 		EuclidsEnchantmentEffects.REGISTRY.register(bus);
+		VanillaTradeOfferTypes.REGISTRY.register(bus);
 	}
 
 }

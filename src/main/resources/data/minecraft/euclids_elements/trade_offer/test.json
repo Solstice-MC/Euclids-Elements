@@ -1,0 +1,12 @@
+{
+	"trades": [
+		{
+			"type": "minecraft:buy_item",
+			"item": "minecraft:wheat",
+			"count": 20,
+			"max_uses": 16,
+			"experience": 2,
+			"price": 1
+		}
+	]
+}
