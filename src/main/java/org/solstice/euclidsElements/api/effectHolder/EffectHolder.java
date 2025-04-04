@@ -132,7 +132,7 @@ public interface EffectHolder {
     }
 
     default void onTargetDamaged(ServerWorld world, int level, EnchantmentEffectContext context, EnchantmentEffectTarget target, Entity user, DamageSource damageSource) {
-        for(TargetedEnchantmentEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.POST_ATTACK)) {
+        for (TargetedEnchantmentEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.POST_ATTACK)) {
             if (target == effect.enchanted())
                 Enchantment.applyTargetedEffect(effect, world, level, context, user, damageSource);
         }

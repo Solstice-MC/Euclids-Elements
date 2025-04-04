@@ -72,14 +72,14 @@ public class EffectHolderHelper {
             EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
             component.getEffects().forEach((entry, level) -> {
                 if (entry.value().slotMatches(slot)) {
-                    contextAwareConsumer.accept(entry, level, context);
+					contextAwareConsumer.accept(entry, level, context);
                 }
             });
         });
     }
 
     public static void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer consumer) {
-        for(EquipmentSlot slot : EquipmentSlot.values()) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
             forEachEffectHolder(entity.getEquippedStack(slot), slot, entity, consumer);
         }
     }

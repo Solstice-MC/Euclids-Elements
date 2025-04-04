@@ -1,13 +1,10 @@
 package org.solstice.euclidsElements.mixin;
 
 import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -30,7 +27,6 @@ import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableObject;
-import org.solstice.euclidsElements.api.effectHolder.EffectHolder;
 import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -43,7 +39,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-@Mixin(EnchantmentHelper.class)
+@Mixin(value = EnchantmentHelper.class, remap = false)
 public abstract class EnchantmentHelperMixin {
 
     /**
@@ -202,19 +198,19 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void onTargetDamaged(ServerWorld world, Entity target, DamageSource source, @Nullable ItemStack weaponStack) {
-        if (target instanceof LivingEntity livingTarget) {
-            EffectHolderHelper.forEachEffectHolder(livingTarget,
+    public static void onTargetDamaged(ServerWorld world, Entity target, DamageSource source, @Nullable ItemStack stack) {
+		if (target instanceof LivingEntity livingTarget) {
+			EffectHolderHelper.forEachEffectHolder(livingTarget,
                 (effectHolder, level, context) ->
                     effectHolder.value().onTargetDamaged(world, level, context, EnchantmentEffectTarget.VICTIM, target, source)
             );
         }
 
-        if (weaponStack == null) return;
+        if (stack == null) return;
 
         Entity attacker = source.getAttacker();
         if (attacker instanceof LivingEntity livingAttacker) {
-            EffectHolderHelper.forEachEffectHolder(weaponStack, EquipmentSlot.MAINHAND, livingAttacker,
+			EffectHolderHelper.forEachEffectHolder(stack, EquipmentSlot.MAINHAND, livingAttacker,
                 (effectHolder, level, context) ->
                     effectHolder.value().onTargetDamaged(world, level, context, EnchantmentEffectTarget.ATTACKER, target, source)
             );
