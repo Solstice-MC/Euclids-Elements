@@ -8,6 +8,8 @@ import java.util.Set;
 
 public interface EntityEffectHolderData {
 
-    Map<EffectHolder, Set<EnchantmentLocationBasedEffect>> getLocationBasedEffects();
+    default Map<EffectHolder, Set<EnchantmentLocationBasedEffect>> getLocationBasedEffects() {
+		return Map.of();
+	}
 
 }
