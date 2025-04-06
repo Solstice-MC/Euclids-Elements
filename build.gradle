@@ -7,10 +7,18 @@ base.archivesName = mod_id
 group = mod_group
 version = mod_version
 
+sourceSets {
+	testmod {
+		compileClasspath += main.compileClasspath
+		runtimeClasspath += main.runtimeClasspath
+	}
+}
+
 repositories {
     maven { url 'https://maven.neoforged.net/releases' }
 	mavenCentral()
 }
+
 
 dependencies {
     minecraft "net.minecraft:minecraft:$minecraft_version"
@@ -19,12 +27,24 @@ dependencies {
         it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$yarn_mappings_patch_version")
     }
     neoForge "net.neoforged:neoforge:$neoforge_version"
+
+	testmodImplementation sourceSets.main.output
 }
 
 loom {
     interfaceInjection {
         enableDependencyInterfaceInjection = true
     }
+	runs {
+		client {
+			source sourceSets.testmod
+			name = "Minecraft Client"
+		}
+		server {
+			source sourceSets.testmod
+			name = "Minecraft Server"
+		}
+	}
 }
 
 processResources {

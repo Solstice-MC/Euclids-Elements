@@ -1,0 +1,10 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "LGPL-3.0"
+
+[[mods]]
+modId = "tabula"
+version = "0.0.0"
+displayName = "Tabula"
+authors = "Solstice"
+logoFile = "assets/${mod_id}/icon.png"
