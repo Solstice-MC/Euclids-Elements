@@ -4,6 +4,26 @@
 
 **Euclid's Elements** is a library mod for creating customizable content mods.
 
+# Usage
+
+Add the Solstice Maven to your build file.
+
+`build.gradle`
+```java
+repositories {
+	maven { url "https://dl.cloudsmith.io/public/solstice-mc/artifacts/maven/" }
+}
+```
+
+Then add Euclid's Elements as a dependency.
+
+`build.gradle`
+```java
+dependencies {
+	modImplementation "org.solstice:Euclids-Elements:${euclids_elements_version}"
+}
+```
+
 # Features
 
 ## Effect Holder API
@@ -14,4 +34,4 @@ Finally, add the item component to the `euclids_elements/tags/data_component_typ
 
 ## Tooltip Holders (W.I.P.)
 
-Automatically add item components that implement `TooltipAppender` to item tooltips by adding them to the `euclids_elements/tags/data_component_type/tooltip_holder.json` tag
+Automatically add item components that implement `TooltipAppender` to item tooltips by adding them to the `euclids_elements/tags/data_component_type/tooltip_holder.json` tag.
