@@ -4,7 +4,7 @@ license = "LGPL-3.0"
 
 [[mods]]
 modId = "tabula"
-version = "0.0.0"
+version = "3.2.3"
 displayName = "Tabula"
 authors = "Solstice"
 logoFile = "assets/${mod_id}/icon.png"

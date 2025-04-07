@@ -1,5 +1,5 @@
 plugins {
-	id 'dev.architectury.loom' version '1.7-SNAPSHOT'
+    id 'dev.architectury.loom' version '1.7-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -15,26 +15,26 @@ sourceSets {
 }
 
 repositories {
-	maven { url 'https://maven.neoforged.net/releases' }
+    maven { url 'https://maven.neoforged.net/releases' }
 	mavenCentral()
 }
 
 
 dependencies {
-	minecraft "net.minecraft:minecraft:$minecraft_version"
-	mappings loom.layered {
-		it.mappings("net.fabricmc:yarn:$yarn_mappings:v2")
-		it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$yarn_mappings_patch_version")
-	}
-	neoForge "net.neoforged:neoforge:$neoforge_version"
+    minecraft "net.minecraft:minecraft:$minecraft_version"
+    mappings loom.layered {
+        it.mappings("net.fabricmc:yarn:$yarn_mappings:v2")
+        it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$yarn_mappings_patch_version")
+    }
+    neoForge "net.neoforged:neoforge:$neoforge_version"
 
 	testmodImplementation sourceSets.main.output
 }
 
 loom {
-	interfaceInjection {
-		enableDependencyInterfaceInjection = true
-	}
+    interfaceInjection {
+        enableDependencyInterfaceInjection = true
+    }
 	runs {
 		datagen {
 			data()
@@ -56,10 +56,9 @@ loom {
 }
 
 processResources {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	filesMatching('META-INF/neoforge.mods.toml') {
-		expand project.properties
-	}
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand project.properties
+    }
 }
 
 publishing {
@@ -70,3 +69,10 @@ publishing {
 	}
 }
 tasks.build.finalizedBy publishToMavenLocal
+
+processResources {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	filesMatching('META-INF/neoforge.mods.toml') {
+		expand project.properties
+	}
+}
