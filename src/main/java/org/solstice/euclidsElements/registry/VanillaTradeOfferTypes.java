@@ -8,7 +8,7 @@ import org.solstice.euclidsElements.api.dataTradeOffer.TradeOfferType;
 public class VanillaTradeOfferTypes {
 
 	public static final DeferredRegister<Codec<TradeOfferType>> REGISTRY = DeferredRegister
-		.create(EuclidsRegistries.TRADE_OFFER_TYPE, EuclidsElements.MOD_ID);
+		.create(EuclidsRegistries.TRADE_OFFER_TYPE_REGISTRY, EuclidsElements.MOD_ID);
 
 //	public static final Codec<TradeOfferType> BUY_ITEM = register("buy_item", BuyItemOffer.CODEC);
 

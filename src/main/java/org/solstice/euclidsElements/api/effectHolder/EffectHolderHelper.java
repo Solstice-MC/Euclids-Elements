@@ -1,15 +1,15 @@
 package org.solstice.euclidsElements.api.effectHolder;
 
-import net.minecraft.component.ComponentType;
-import net.minecraft.enchantment.EnchantmentEffectContext;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantedItemInUse;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
@@ -25,10 +25,10 @@ import java.util.List;
 @EventBusSubscriber(modid = EuclidsElements.MOD_ID)
 public class EffectHolderHelper {
 
-    public static final List<ComponentType<? extends EffectHolderComponent<?>>> EFFECT_HOLDER_COMPONENTS = new ArrayList<>();
+    public static final List<DataComponentType<? extends EffectHolderComponent<?>>> EFFECT_HOLDER_COMPONENTS = new ArrayList<>();
 
-	public static final TagKey<ComponentType<?>> EFFECT_HOLDER =
-		TagKey.of(RegistryKeys.DATA_COMPONENT_TYPE, EuclidsElements.of("effect_holder"));
+	public static final TagKey<DataComponentType<?>> EFFECT_HOLDER =
+		TagKey.create(Registries.DATA_COMPONENT_TYPE, EuclidsElements.of("effect_holder"));
 
 	@SubscribeEvent
 	public static void onAddReloadListeners(AddReloadListenerEvent event) {
@@ -37,18 +37,18 @@ public class EffectHolderHelper {
 
 	@SubscribeEvent
 	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-		initializeEffectHolderComponents(event.getServer().getRegistryManager().toImmutable());
+		initializeEffectHolderComponents(event.getServer().registryAccess().freeze());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static void initializeEffectHolderComponents(RegistryWrapper.WrapperLookup lookup) {
-		RegistryEntryList<ComponentType<?>> entries = RegistryHelper.getTagValues(lookup, RegistryKeys.DATA_COMPONENT_TYPE, EFFECT_HOLDER);
+	public static void initializeEffectHolderComponents(HolderLookup.Provider lookup) {
+		HolderSet<DataComponentType<?>> entries = RegistryHelper.getTagValues(lookup, Registries.DATA_COMPONENT_TYPE, EFFECT_HOLDER);
 
 		EFFECT_HOLDER_COMPONENTS.clear();
 		entries.forEach(entry -> {
-			ComponentType<?> component = entry.value();
+			DataComponentType<?> component = entry.value();
 			try {
-				ComponentType<? extends EffectHolderComponent<?>> holder = (ComponentType<? extends EffectHolderComponent<?>>) component;
+				DataComponentType<? extends EffectHolderComponent<?>> holder = (DataComponentType<? extends EffectHolderComponent<?>>) component;
 				EFFECT_HOLDER_COMPONENTS.add(holder);
 			} catch (ClassCastException ignored) {}
 		});
@@ -69,7 +69,7 @@ public class EffectHolderHelper {
             EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
             if (component == null) return;
 
-            EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
+			EnchantedItemInUse context = new EnchantedItemInUse(stack, slot, entity);
             component.getEffects().forEach((entry, level) -> {
                 if (entry.value().slotMatches(slot)) {
 					contextAwareConsumer.accept(entry, level, context);
@@ -80,7 +80,7 @@ public class EffectHolderHelper {
 
     public static void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer consumer) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            forEachEffectHolder(entity.getEquippedStack(slot), slot, entity, consumer);
+            forEachEffectHolder(entity.getItemBySlot(slot), slot, entity, consumer);
         }
     }
 
@@ -95,12 +95,12 @@ public class EffectHolderHelper {
 
     @FunctionalInterface
     public interface Consumer {
-        void accept(RegistryEntry<? extends EffectHolder> enchantment, int level);
+        void accept(Holder<? extends EffectHolder> enchantment, int level);
     }
 
     @FunctionalInterface
     public interface ContextAwareConsumer {
-        void accept(RegistryEntry<? extends EffectHolder> enchantment, int level, EnchantmentEffectContext context);
+        void accept(Holder<? extends EffectHolder> enchantment, int level, EnchantedItemInUse context);
     }
 
 }

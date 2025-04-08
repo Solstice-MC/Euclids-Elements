@@ -1,23 +1,24 @@
 package org.solstice.euclidsElements.api.effectHolder;
 
 import it.unimi.dsi.fastutil.objects.ObjectArraySet;
-import net.minecraft.block.BlockState;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentType;
-import net.minecraft.component.EnchantmentEffectComponentTypes;
-import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentEffectContext;
-import net.minecraft.enchantment.effect.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.*;
+import net.minecraft.world.item.enchantment.effects.DamageImmunity;
+import net.minecraft.world.item.enchantment.effects.EnchantmentEntityEffect;
+import net.minecraft.world.item.enchantment.effects.EnchantmentLocationBasedEffect;
+import net.minecraft.world.item.enchantment.effects.EnchantmentValueEffect;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects;
 
@@ -27,224 +28,222 @@ import java.util.function.Consumer;
 
 public interface EffectHolder {
 
-    ComponentMap getEffects();
+	DataComponentMap getEffects();
 
     Definition getDefinition();
 
     default boolean slotMatches(EquipmentSlot equipmentSlot) {
-        return this.getDefinition().getSlots().stream().anyMatch(slot -> slot.matches(equipmentSlot));
+        return this.getDefinition().getSlots().stream().anyMatch(slot -> slot.test(equipmentSlot));
     }
 
-
-    static <T> void applyEffects(List<EnchantmentEffectEntry<T>> entries, LootContext context, Consumer<T> effectConsumer) {
+    static <T> void applyEffects(List<ConditionalEffect<T>> entries, LootContext context, Consumer<T> effectConsumer) {
         entries.forEach(effect -> {
-            if (effect.test(context)) {
+            if (effect.matches(context)) {
                 effectConsumer.accept(effect.effect());
             }
         });
     }
 
-    default <T> List<T> getEffect(ComponentType<List<T>> type) {
+    default <T> List<T> getEffect(DataComponentType<List<T>> type) {
         return this.getEffects().getOrDefault(type, List.of());
     }
 
 
-    default void onTick(ServerWorld world, int level, EnchantmentEffectContext context, Entity user) {
+    default void onTick(ServerLevel world, int level, EnchantedItemInUse context, Entity user) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.TICK),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> effect.apply(world, level, context, user, user.getPos())
+                this.getEffect(EnchantmentEffectComponents.TICK),
+                Enchantment.entityContext(world, level, user, user.position()),
+                effect -> effect.apply(world, level, context, user, user.position())
         );
     }
 
-    default void onProjectileSpawned(ServerWorld world, int level, EnchantmentEffectContext context, Entity user) {
+    default void onProjectileSpawned(ServerLevel world, int level, EnchantedItemInUse context, Entity user) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.PROJECTILE_SPAWNED),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> effect.apply(world, level, context, user, user.getPos())
+                this.getEffect(EnchantmentEffectComponents.PROJECTILE_SPAWNED),
+                Enchantment.entityContext(world, level, user, user.position()),
+                effect -> effect.apply(world, level, context, user, user.position())
         );
     }
 
-    default void onHitBlock(ServerWorld world, int level, EnchantmentEffectContext context, Entity enchantedEntity, Vec3d pos, BlockState state) {
+    default void onHitBlock(ServerLevel world, int level, EnchantedItemInUse context, Entity enchantedEntity, Vec3 pos, BlockState state) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.HIT_BLOCK),
-                Enchantment.createHitBlockLootContext(world, level, enchantedEntity, pos, state),
+                this.getEffect(EnchantmentEffectComponents.HIT_BLOCK),
+                Enchantment.blockHitContext(world, level, enchantedEntity, pos, state),
                 effect -> effect.apply(world, level, context, enchantedEntity, pos)
         );
     }
 
-    default void modifyValue(ComponentType<EnchantmentValueEffect> type, Random random, int level, MutableFloat value) {
+    default void modifyValue(DataComponentType<EnchantmentValueEffect> type, RandomSource random, int level, MutableFloat value) {
         EnchantmentValueEffect effect = this.getEffects().get(type);
         if (effect != null) {
-            value.setValue(effect.apply(level, random, value.floatValue()));
+            value.setValue(effect.process(level, random, value.floatValue()));
         }
     }
 
-    default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, MutableFloat value) {
+    default void modifyValue(DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>> type, ServerLevel world, int level, ItemStack stack, MutableFloat value) {
         applyEffects(
                 this.getEffect(type),
-                Enchantment.createEnchantedItemLootContext(world, level, stack),
-                effect -> value.setValue(effect.apply(level, world.getRandom(), value.getValue()))
+                Enchantment.itemContext(world, level, stack),
+                effect -> value.setValue(effect.process(level, world.getRandom(), value.getValue()))
         );
     }
 
-    default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat value) {
+    default void modifyValue(DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>> type, ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat value) {
         applyEffects(
                 this.getEffect(type),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
+                Enchantment.entityContext(world, level, user, user.position()),
+                effect -> value.setValue(effect.process(level, user.getRandom(), value.floatValue()))
         );
     }
 
-    default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat value) {
+    default void modifyValue(DataComponentType<List<ConditionalEffect<EnchantmentValueEffect>>> type, ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat value) {
         applyEffects(
                 this.getEffect(type),
-                Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource),
-                effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
+                Enchantment.damageContext(world, level, user, damageSource),
+                effect -> value.setValue(effect.process(level, user.getRandom(), value.floatValue()))
         );
     }
 
-    default boolean hasDamageImmunityTo(ServerWorld world, int level, Entity user, DamageSource damageSource) {
-        LootContext context = Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource);
+    default boolean hasDamageImmunityTo(ServerLevel world, int level, Entity user, DamageSource damageSource) {
+        LootContext context = Enchantment.damageContext(world, level, user, damageSource);
 
-        for(EnchantmentEffectEntry<DamageImmunityEnchantmentEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.DAMAGE_IMMUNITY)) {
-            if (effect.test(context)) return true;
+        for(ConditionalEffect<DamageImmunity> effect : this.getEffect(EnchantmentEffectComponents.DAMAGE_IMMUNITY)) {
+            if (effect.matches(context)) return true;
         }
         return false;
     }
 
-    default void modifyDamageProtection(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damageProtection) {
-        LootContext context = Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource);
+    default void modifyDamageProtection(ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damageProtection) {
+        LootContext context = Enchantment.damageContext(world, level, user, damageSource);
 
-        for(EnchantmentEffectEntry<EnchantmentValueEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.DAMAGE_PROTECTION)) {
-            if (effect.test(context)) damageProtection.setValue(
-                    effect.effect().apply(level, user.getRandom(), damageProtection.floatValue())
+        for(ConditionalEffect<EnchantmentValueEffect> effect : this.getEffect(EnchantmentEffectComponents.DAMAGE_PROTECTION)) {
+            if (effect.matches(context)) damageProtection.setValue(
+                    effect.effect().process(level, user.getRandom(), damageProtection.floatValue())
             );
         }
     }
 
-    default void modifyItemDamage(ServerWorld world, int level, ItemStack stack, MutableFloat itemDamage) {
-        this.modifyValue(EnchantmentEffectComponentTypes.ITEM_DAMAGE, world, level, stack, itemDamage);
+    default void modifyItemDamage(ServerLevel world, int level, ItemStack stack, MutableFloat itemDamage) {
+        this.modifyValue(EnchantmentEffectComponents.ITEM_DAMAGE, world, level, stack, itemDamage);
     }
 
-    default void modifyAmmoUse(ServerWorld world, int level, ItemStack projectileStack, MutableFloat ammoUse) {
-        this.modifyValue(EnchantmentEffectComponentTypes.AMMO_USE, world, level, projectileStack, ammoUse);
+    default void modifyAmmoUse(ServerLevel world, int level, ItemStack projectileStack, MutableFloat ammoUse) {
+        this.modifyValue(EnchantmentEffectComponents.AMMO_USE, world, level, projectileStack, ammoUse);
     }
 
-    default void onTargetDamaged(ServerWorld world, int level, EnchantmentEffectContext context, EnchantmentEffectTarget target, Entity user, DamageSource damageSource) {
-        for (TargetedEnchantmentEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.POST_ATTACK)) {
+    default void onTargetDamaged(ServerLevel world, int level, EnchantedItemInUse context, EnchantmentTarget target, Entity user, DamageSource damageSource) {
+        for (TargetedConditionalEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponents.POST_ATTACK)) {
             if (target == effect.enchanted())
-                Enchantment.applyTargetedEffect(effect, world, level, context, user, damageSource);
+                Enchantment.doPostAttack(effect, world, level, context, user, damageSource);
         }
     }
 
-    default void modifyProjectilePiercing(ServerWorld world, int level, ItemStack stack, MutableFloat projectilePiercing) {
-        this.modifyValue(EnchantmentEffectComponentTypes.PROJECTILE_PIERCING, world, level, stack, projectilePiercing);
+    default void modifyProjectilePiercing(ServerLevel world, int level, ItemStack stack, MutableFloat projectilePiercing) {
+        this.modifyValue(EnchantmentEffectComponents.PROJECTILE_PIERCING, world, level, stack, projectilePiercing);
     }
 
-    default void modifyBlockExperience(ServerWorld world, int level, ItemStack stack, MutableFloat blockExperience) {
-        this.modifyValue(EnchantmentEffectComponentTypes.BLOCK_EXPERIENCE, world, level, stack, blockExperience);
+    default void modifyBlockExperience(ServerLevel world, int level, ItemStack stack, MutableFloat blockExperience) {
+        this.modifyValue(EnchantmentEffectComponents.BLOCK_EXPERIENCE, world, level, stack, blockExperience);
     }
 
-    default void modifyMobExperience(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat mobExperience) {
-        this.modifyValue(EnchantmentEffectComponentTypes.MOB_EXPERIENCE, world, level, stack, user, mobExperience);
+    default void modifyMobExperience(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat mobExperience) {
+        this.modifyValue(EnchantmentEffectComponents.MOB_EXPERIENCE, world, level, stack, user, mobExperience);
     }
 
-    default void modifyRepairWithXp(ServerWorld world, int level, ItemStack stack, MutableFloat repairWithXp) {
-        this.modifyValue(EnchantmentEffectComponentTypes.REPAIR_WITH_XP, world, level, stack, repairWithXp);
+    default void modifyRepairWithXp(ServerLevel world, int level, ItemStack stack, MutableFloat repairWithXp) {
+        this.modifyValue(EnchantmentEffectComponents.REPAIR_WITH_XP, world, level, stack, repairWithXp);
     }
 
-    default void modifyTridentReturnAcceleration(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat tridentReturnAcceleration) {
-        this.modifyValue(EnchantmentEffectComponentTypes.TRIDENT_RETURN_ACCELERATION, world, level, stack, user, tridentReturnAcceleration);
+    default void modifyTridentReturnAcceleration(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat tridentReturnAcceleration) {
+        this.modifyValue(EnchantmentEffectComponents.TRIDENT_RETURN_ACCELERATION, world, level, stack, user, tridentReturnAcceleration);
     }
 
-    default void modifyTridentSpinAttackStrength(Random random, int level, MutableFloat tridentSpinAttackStrength) {
-        this.modifyValue(EnchantmentEffectComponentTypes.TRIDENT_SPIN_ATTACK_STRENGTH, random, level, tridentSpinAttackStrength);
+    default void modifyTridentSpinAttackStrength(RandomSource random, int level, MutableFloat tridentSpinAttackStrength) {
+        this.modifyValue(EnchantmentEffectComponents.TRIDENT_SPIN_ATTACK_STRENGTH, random, level, tridentSpinAttackStrength);
     }
 
-    default void modifyFishingTimeReduction(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat fishingTimeReduction) {
-        this.modifyValue(EnchantmentEffectComponentTypes.FISHING_TIME_REDUCTION, world, level, stack, user, fishingTimeReduction);
+    default void modifyFishingTimeReduction(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat fishingTimeReduction) {
+        this.modifyValue(EnchantmentEffectComponents.FISHING_TIME_REDUCTION, world, level, stack, user, fishingTimeReduction);
     }
 
-    default void modifyFishingLuckBonus(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat fishingLuckBonus) {
-        this.modifyValue(EnchantmentEffectComponentTypes.FISHING_LUCK_BONUS, world, level, stack, user, fishingLuckBonus);
+    default void modifyFishingLuckBonus(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat fishingLuckBonus) {
+        this.modifyValue(EnchantmentEffectComponents.FISHING_LUCK_BONUS, world, level, stack, user, fishingLuckBonus);
     }
 
-    default void modifyDamage(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damage) {
-        this.modifyValue(EnchantmentEffectComponentTypes.DAMAGE, world, level, stack, user, damageSource, damage);
+    default void modifyDamage(ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat damage) {
+        this.modifyValue(EnchantmentEffectComponents.DAMAGE, world, level, stack, user, damageSource, damage);
     }
 
-    default void modifySmashDamagePerFallenBlock(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat smashDamagePerFallenBlock) {
-        this.modifyValue(EnchantmentEffectComponentTypes.SMASH_DAMAGE_PER_FALLEN_BLOCK, world, level, stack, user, damageSource, smashDamagePerFallenBlock);
+    default void modifySmashDamagePerFallenBlock(ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat smashDamagePerFallenBlock) {
+        this.modifyValue(EnchantmentEffectComponents.SMASH_DAMAGE_PER_FALLEN_BLOCK, world, level, stack, user, damageSource, smashDamagePerFallenBlock);
     }
 
-    default void modifyKnockback(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat knockback) {
-        this.modifyValue(EnchantmentEffectComponentTypes.KNOCKBACK, world, level, stack, user, damageSource, knockback);
+    default void modifyKnockback(ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat knockback) {
+        this.modifyValue(EnchantmentEffectComponents.KNOCKBACK, world, level, stack, user, damageSource, knockback);
     }
 
-    default void modifyArmorEffectiveness(ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat armorEffectiveness) {
-        this.modifyValue(EnchantmentEffectComponentTypes.ARMOR_EFFECTIVENESS, world, level, stack, user, damageSource, armorEffectiveness);
+    default void modifyArmorEffectiveness(ServerLevel world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat armorEffectiveness) {
+        this.modifyValue(EnchantmentEffectComponents.ARMOR_EFFECTIVENESS, world, level, stack, user, damageSource, armorEffectiveness);
     }
 
-    default void modifyProjectileCount(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat projectileCount) {
-        this.modifyValue(EnchantmentEffectComponentTypes.PROJECTILE_COUNT, world, level, stack, user, projectileCount);
+    default void modifyProjectileCount(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat projectileCount) {
+        this.modifyValue(EnchantmentEffectComponents.PROJECTILE_COUNT, world, level, stack, user, projectileCount);
     }
 
-    default void modifyProjectileSpread(ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat projectileSpread) {
-        this.modifyValue(EnchantmentEffectComponentTypes.PROJECTILE_SPREAD, world, level, stack, user, projectileSpread);
+    default void modifyProjectileSpread(ServerLevel world, int level, ItemStack stack, Entity user, MutableFloat projectileSpread) {
+        this.modifyValue(EnchantmentEffectComponents.PROJECTILE_SPREAD, world, level, stack, user, projectileSpread);
     }
 
-    default void modifyCrossbowChargeTime(Random random, int level, MutableFloat crossbowChargeTime) {
-        this.modifyValue(EnchantmentEffectComponentTypes.CROSSBOW_CHARGE_TIME, random, level, crossbowChargeTime);
+    default void modifyCrossbowChargeTime(RandomSource random, int level, MutableFloat crossbowChargeTime) {
+        this.modifyValue(EnchantmentEffectComponents.CROSSBOW_CHARGE_TIME, random, level, crossbowChargeTime);
     }
 
 	default void modifyMaxDurability(int level, MutableFloat maxDurability) {
-		this.modifyValue(EuclidsEnchantmentEffects.MAX_DURABILITY, Random.create(), level, maxDurability);
+		this.modifyValue(EuclidsEnchantmentEffects.MAX_DURABILITY, RandomSource.create(), level, maxDurability);
 	}
 
 
-    default void applyLocationBasedEffects(ServerWorld world, int level, EnchantmentEffectContext context, LivingEntity user) {
-		Set<EnchantmentLocationBasedEffect> locationEffects = user.getLocationBasedEffects().remove(this);
-        if (context.slot() != null && !this.slotMatches(context.slot())) {
-			if (locationEffects != null) locationEffects.forEach(effect -> effect.remove(context, user, user.getPos(), level));
+    default void applyLocationBasedEffects(ServerLevel world, int level, EnchantedItemInUse context, LivingEntity user) {
+		Set<EnchantmentLocationBasedEffect> locationEffects = user.activeLocationDependentEnchantments().remove(this);
+        if (context.inSlot() != null && !this.slotMatches(context.inSlot())) {
+			if (locationEffects != null) locationEffects.forEach(effect -> effect.onDeactivated(context, user, user.position(), level));
 			return;
 		}
 
-		for (EnchantmentEffectEntry<EnchantmentLocationBasedEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.LOCATION_CHANGED)) {
+		for (ConditionalEffect<EnchantmentLocationBasedEffect> effect : this.getEffect(EnchantmentEffectComponents.LOCATION_CHANGED)) {
 			EnchantmentLocationBasedEffect locationEffect = effect.effect();
 			boolean flag = locationEffects != null && locationEffects.contains(locationEffect);
-			if (effect.test(Enchantment.createEnchantedLocationLootContext(world, level, user, flag))) {
+			if (effect.matches(Enchantment.locationContext(world, level, user, flag))) {
 				if (!flag) {
 					if (locationEffects == null) {
 						locationEffects = new ObjectArraySet<>();
-						user.getLocationBasedEffects().put(this, locationEffects);
+						user.activeLocationDependentEnchantments().put(this, locationEffects);
 					}
 
 					locationEffects.add(locationEffect);
 				}
 
-				locationEffect.apply(world, level, context, user, user.getPos(), !flag);
+				locationEffect.onChangedBlock(world, level, context, user, user.position(), !flag);
 			} else if (locationEffects != null && locationEffects.remove(locationEffect)) {
-				locationEffect.remove(context, user, user.getPos(), level);
+				locationEffect.onDeactivated(context, user, user.position(), level);
 			}
 		}
 
-		if (locationEffects != null && locationEffects.isEmpty()) user.getLocationBasedEffects().remove(this);
+		if (locationEffects != null && locationEffects.isEmpty()) user.activeLocationDependentEnchantments().remove(this);
     }
 
-    default void removeLocationBasedEffects(int level, EnchantmentEffectContext context, LivingEntity user) {
-        Set<EnchantmentLocationBasedEffect> set = user.getLocationBasedEffects().remove(this);
+    default void removeLocationBasedEffects(int level, EnchantedItemInUse context, LivingEntity user) {
+        Set<EnchantmentLocationBasedEffect> set = user.activeLocationDependentEnchantments().remove(this);
         if (set == null) return;
 
-        for(EnchantmentLocationBasedEffect effect : set) {
-            effect.remove(context, user, user.getPos(), level);
+        for (EnchantmentLocationBasedEffect effect : set) {
+            effect.onDeactivated(context, user, user.position(), level);
         }
     }
 
-
     interface Definition {
         int getMaxLevel();
-        List<AttributeModifierSlot> getSlots();
+        List<EquipmentSlotGroup> getSlots();
     }
 
 }

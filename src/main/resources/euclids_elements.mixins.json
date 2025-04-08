@@ -15,6 +15,6 @@
 	},
 	"client": [
 		"ItemModelsMixin",
-		"ModelLoaderMixin"
+		"ModelBakerMixin"
 	]
 }

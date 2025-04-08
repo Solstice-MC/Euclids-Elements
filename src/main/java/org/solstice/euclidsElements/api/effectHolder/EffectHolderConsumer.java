@@ -1,10 +1,10 @@
 package org.solstice.euclidsElements.api.effectHolder;
 
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
 
 @FunctionalInterface
 public interface EffectHolderConsumer {
 
-    void accept(RegistryEntry<? extends EffectHolder> enchantment, int level);
+    void accept(Holder<? extends EffectHolder> enchantment, int level);
 
 }

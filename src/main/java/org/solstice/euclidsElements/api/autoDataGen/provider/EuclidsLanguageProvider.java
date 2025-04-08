@@ -1,19 +1,11 @@
 package org.solstice.euclidsElements.api.autoDataGen.provider;
 
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.DataWriter;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.tag.TagKey;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.Tags;
 
+import java.io.DataOutput;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;

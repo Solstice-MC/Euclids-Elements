@@ -1,11 +1,11 @@
 package org.solstice.euclidsElements.util;
 
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.TagKey;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -13,17 +13,17 @@ import java.util.Optional;
 public class RegistryHelper {
 
 	@SuppressWarnings("unchecked")
-	public static <T> RegistryEntryList<T> getTagValues (
-		@Nullable RegistryWrapper.WrapperLookup lookup,
-		RegistryKey<Registry<T>> registry,
+	public static <T> HolderSet<T> getTagValues (
+		@Nullable HolderLookup.Provider lookup,
+		ResourceKey<Registry<T>> registry,
 		TagKey<T> tag
 	) {
 		if (lookup != null) {
-			Optional<RegistryEntryList.Named<T>> result = lookup.getWrapperOrThrow(registry).getOptional(tag);
+			Optional<HolderSet.Named<T>> result = lookup.lookupOrThrow(registry).get(tag);
 			if (result.isPresent()) return result.get();
 		}
 
-		return RegistryEntryList.of(new RegistryEntry[0]);
+		return HolderSet.direct(new Holder[]{});
 	}
 
 }

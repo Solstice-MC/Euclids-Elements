@@ -2,11 +2,11 @@ package org.solstice.euclidsElements.mixin;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
-import net.minecraft.enchantment.effect.EnchantmentLocationBasedEffect;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.enchantment.effects.EnchantmentLocationBasedEffect;
+import net.minecraft.world.level.Level;
 import org.solstice.euclidsElements.api.effectHolder.EffectHolder;
 import org.solstice.euclidsElements.api.effectHolder.entity.EntityEffectHolderData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +20,7 @@ public abstract class LivingEntityMixin extends Entity implements EntityEffectHo
 
     @Unique private final Reference2ObjectMap<EffectHolder, Set<EnchantmentLocationBasedEffect>> locationBasedEffects = new Reference2ObjectArrayMap<>();
 
-    public LivingEntityMixin(EntityType<?> type, World world) {
+    public LivingEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
