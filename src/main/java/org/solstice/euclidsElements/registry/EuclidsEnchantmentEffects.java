@@ -7,13 +7,12 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.registry.Registry;
 import org.solstice.euclidsElements.EuclidsElements;
 
 public class EuclidsEnchantmentEffects {
 
-	public static final DeferredRegister<ComponentType<?>> REGISTRY = DeferredRegister
-		.create(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, EuclidsElements.MOD_ID);
+	public static void init() {}
 
 	public static final ComponentType<EnchantmentValueEffect> MAX_DURABILITY = register("max_durability", EnchantmentValueEffect.CODEC);
 
@@ -27,8 +26,7 @@ public class EuclidsEnchantmentEffects {
 			.packetCodec(packetCodec)
 			.cache()
 			.build();
-		REGISTRY.register(name, () -> component);
-		return component;
+		return Registry.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE, EuclidsElements.of(name), component);
 	}
 
 }

@@ -10,10 +10,7 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.TagKey;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.api.effectHolder.item.component.EffectHolderComponent;
@@ -22,7 +19,6 @@ import org.solstice.euclidsElements.util.RegistryHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = EuclidsElements.MOD_ID)
 public class EffectHolderHelper {
 
     public static final List<ComponentType<? extends EffectHolderComponent<?>>> EFFECT_HOLDER_COMPONENTS = new ArrayList<>();
@@ -30,18 +26,9 @@ public class EffectHolderHelper {
 	public static final TagKey<ComponentType<?>> EFFECT_HOLDER =
 		TagKey.of(RegistryKeys.DATA_COMPONENT_TYPE, EuclidsElements.of("effect_holder"));
 
-	@SubscribeEvent
-	public static void onAddReloadListeners(AddReloadListenerEvent event) {
-		initializeEffectHolderComponents(event.getRegistryAccess());
-	}
-
-	@SubscribeEvent
-	public static void onServerAboutToStart(ServerAboutToStartEvent event) {
-		initializeEffectHolderComponents(event.getServer().getRegistryManager().toImmutable());
-	}
-
 	@SuppressWarnings("unchecked")
-	public static void initializeEffectHolderComponents(RegistryWrapper.WrapperLookup lookup) {
+	public static void initializeEffectHolderComponents(MinecraftServer server) {
+		RegistryWrapper.WrapperLookup lookup = server.getRegistryManager();
 		RegistryEntryList<ComponentType<?>> entries = RegistryHelper.getTagValues(lookup, RegistryKeys.DATA_COMPONENT_TYPE, EFFECT_HOLDER);
 
 		EFFECT_HOLDER_COMPONENTS.clear();

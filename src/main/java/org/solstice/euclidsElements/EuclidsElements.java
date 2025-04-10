@@ -1,14 +1,13 @@
 package org.solstice.euclidsElements;
 
+import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.solstice.euclidsElements.registry.*;
+import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
+import org.solstice.euclidsElements.api.event.ExtraServerLifecycleEvents;
 
-@Mod(EuclidsElements.MOD_ID)
-public class EuclidsElements {
+public class EuclidsElements implements ModInitializer {
 
     public static final String MOD_ID = "euclids_elements";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -17,10 +16,12 @@ public class EuclidsElements {
         return Identifier.of(MOD_ID, path);
     }
 
-    public EuclidsElements(IEventBus bus) {
-		EuclidsComponentTypes.REGISTRY.register(bus);
-		EuclidsEnchantmentEffects.REGISTRY.register(bus);
-		VanillaTradeOfferTypes.REGISTRY.register(bus);
+	@Override
+	public void onInitialize() {
+//		EuclidsComponentTypes.REGISTRY.register(bus);
+//		EuclidsEnchantmentEffects.REGISTRY.register(bus);
+//		VanillaTradeOfferTypes.REGISTRY.register(bus);
+		ExtraServerLifecycleEvents.AFTER_RESOURCES_LOADED.register(EffectHolderHelper::initializeEffectHolderComponents);
 	}
 
 }

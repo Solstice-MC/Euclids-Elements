@@ -7,14 +7,13 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.TagKey;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class RegistryHelper {
 
 	@SuppressWarnings("unchecked")
 	public static <T> RegistryEntryList<T> getTagValues (
-		@Nullable RegistryWrapper.WrapperLookup lookup,
+		RegistryWrapper.WrapperLookup lookup,
 		RegistryKey<Registry<T>> registry,
 		TagKey<T> tag
 	) {

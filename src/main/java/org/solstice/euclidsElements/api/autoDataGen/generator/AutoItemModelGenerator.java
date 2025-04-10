@@ -1,42 +1,47 @@
 package org.solstice.euclidsElements.api.autoDataGen.generator;
 
-import net.minecraft.data.DataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.block.Block;
+import net.minecraft.data.client.BlockStateModelGenerator;
+import net.minecraft.data.client.ItemModelGenerator;
 import net.minecraft.data.client.Models;
 import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.item.ToolItem;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
-import net.neoforged.fml.ModContainer;
-import org.solstice.euclidsElements.api.autoDataGen.provider.EuclidsItemModelProvider;
+import org.solstice.euclidsElements.api.autoDataGen.supplier.BlockModelSupplier;
+import org.solstice.euclidsElements.api.autoDataGen.supplier.ItemModelSupplier;
 
-import java.util.concurrent.CompletableFuture;
+public class AutoItemModelGenerator extends FabricModelProvider implements AutoGenerator {
 
-public class AutoItemModelGenerator extends EuclidsItemModelProvider implements AutoGenerator {
+	private final FabricDataOutput output;
 
-	public AutoItemModelGenerator(ModContainer container, DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> lookup) {
-		super(container, output, lookup);
+	public AutoItemModelGenerator(FabricDataOutput output) {
+		super(output);
+		this.output = output;
 	}
 
 	@Override
-	public String getModId() {
-		return this.container.getModId();
+	public ModContainer getContainer() {
+		return this.output.getModContainer();
 	}
 
 	@Override
-	protected void registerModels(RegistryWrapper.WrapperLookup lookup) {
-		lookup.getWrapperOrThrow(RegistryKeys.ITEM)
-			.streamEntries()
+	public void generateItemModels(ItemModelGenerator generator) {
+		Registries.ITEM.streamEntries()
 			.filter(this::ownsEntry)
-			.forEach(this::registerModel);
-
-		this.register(Identifier.of("test"), Models.CARPET);
+			.forEach(entry -> this.generateItemModel(entry, generator));
 	}
 
-	protected void registerModel(RegistryEntry<Item> entry) {
-		Identifier id = entry.getKey().orElseThrow().getValue();
+	public void generateItemModel(RegistryEntry<Item> entry, ItemModelGenerator generator) {
 		Item item = entry.value();
-		this.register(id, Models.GENERATED);
+		Identifier id = entry.getKeyOrValue().left().orElseThrow().getValue();
+		ItemModelSupplier.generate(generator, item, id);
 	}
+
+	@Override public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {}
 
 }

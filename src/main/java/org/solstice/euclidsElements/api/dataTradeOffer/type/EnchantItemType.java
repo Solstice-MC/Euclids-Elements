@@ -14,7 +14,6 @@ import net.minecraft.village.TradeOffers;
 import net.minecraft.village.TradedItem;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class EnchantItemType implements TradeOffers.Factory {
@@ -49,7 +48,6 @@ public class EnchantItemType implements TradeOffers.Factory {
 		this.enchantmentProviderKey = enchantmentProviderKey;
 	}
 
-	@Nullable
 	public TradeOffer create(Entity entity, Random random) {
 		ItemStack itemStack = this.processed.copy();
 		World world = entity.getWorld();

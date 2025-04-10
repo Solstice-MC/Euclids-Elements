@@ -1,14 +1,13 @@
 package org.solstice.euclidsElements.api.autoDataGen.generator;
 
-import net.minecraft.data.DataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
-import net.neoforged.fml.ModContainer;
-import org.solstice.euclidsElements.api.autoDataGen.provider.EuclidsLanguageProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class AutoLanguageGenerator extends EuclidsLanguageProvider implements AutoGenerator {
+public class AutoLanguageGenerator extends FabricLanguageProvider implements AutoGenerator {
 
 	public static final List<RegistryKey<?>> REGISTRY_BLACKLIST = List.of(
 		RegistryKeys.RECIPE_SERIALIZER,
@@ -31,22 +30,23 @@ public class AutoLanguageGenerator extends EuclidsLanguageProvider implements Au
 		return str.substring(0,1).toUpperCase() + str.substring(1);
 	}
 
-	public AutoLanguageGenerator(ModContainer container, DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> lookup) {
-		super(container, output, lookup);
+
+	public AutoLanguageGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
+		super(dataOutput, registryLookup);
 	}
 
 	@Override
-	public String getModId() {
-		return this.container.getModId();
+	public ModContainer getContainer() {
+		return this.dataOutput.getModContainer();
 	}
+
 
 	@Override
-	public void addTranslations(RegistryWrapper.WrapperLookup lookup) {
-		generateRegistryTranslations(lookup);
-		generateTagTranslations(lookup);
+	public void generateTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {
+		generateRegistryTranslations(lookup, builder);
 	}
 
-	public void generateRegistryTranslations(RegistryWrapper.WrapperLookup lookup) {
+	public void generateRegistryTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {
 		lookup.streamAllRegistryKeys()
 			.filter(AutoLanguageGenerator::keyIsNotBlacklisted)
 			.map(lookup::getOptionalWrapper)
@@ -54,11 +54,11 @@ public class AutoLanguageGenerator extends EuclidsLanguageProvider implements Au
 			.map(Optional::get)
 			.forEach(wrapper -> wrapper.streamEntries()
 				.filter(this::ownsEntry)
-				.forEach(this::generateEntryTranslation)
+				.forEach(entry -> this.generateEntryTranslation(entry, builder))
 			);
 	}
 
-	public void generateEntryTranslation(RegistryEntry<?> entry) {
+	public void generateEntryTranslation(RegistryEntry<?> entry, TranslationBuilder builder) {
 		RegistryKey<?> registryKey = entry.getKey().orElse(null);
 		if (registryKey == null) return;
 
@@ -70,23 +70,23 @@ public class AutoLanguageGenerator extends EuclidsLanguageProvider implements Au
 			.stream(id.getPath().split("([_.])"))
 			.map(AutoLanguageGenerator::toUpperCase)
 			.collect(Collectors.joining(" "));
-		this.add(key, translation);
+		builder.add(key, translation);
 	}
 
-	public void generateTagTranslations(RegistryWrapper.WrapperLookup lookup) {
-		lookup.streamAllRegistryKeys().forEach(sKey ->
-			lookup.getWrapperOrThrow(sKey).streamTagKeys().forEach(this::generateTagTranslation)
-		);
-	}
-
-	public void generateTagTranslation(TagKey<?> tag) {
-		Identifier id = tag.id();
-		String key = id.toTranslationKey("tag." + tag.registry().getValue().getPath());
-		String translation = Arrays
-			.stream(id.getPath().split("([_.])"))
-			.map(AutoLanguageGenerator::toUpperCase)
-			.collect(Collectors.joining(" "));
-		this.add(key, translation);
-	}
+//	public void generateTagTranslations(RegistryWrapper.WrapperLookup lookup) {
+//		lookup.streamAllRegistryKeys().forEach(sKey ->
+//			lookup.getWrapperOrThrow(sKey).streamTagKeys().forEach(this::generateTagTranslation)
+//		);
+//	}
+//
+//	public void generateTagTranslation(TagKey<?> tag) {
+//		Identifier id = tag.id();
+//		String key = id.toTranslationKey("tag." + tag.registry().getValue().getPath());
+//		String translation = Arrays
+//			.stream(id.getPath().split("([_.])"))
+//			.map(AutoLanguageGenerator::toUpperCase)
+//			.collect(Collectors.joining(" "));
+//		this.add(key, translation);
+//	}
 
 }

@@ -1,21 +1,17 @@
 package org.solstice.tabula;
 
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import org.solstice.euclidsElements.api.autoDataGen.generator.AutoLanguageGenerator;
+import org.solstice.euclidsElements.api.autoDataGen.generator.AutoLootTableGenerator;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
-public class TabulaDataGenerator {
+public class TabulaDataGenerator implements DataGeneratorEntrypoint {
 
-	@SubscribeEvent
-	public static void gatherData(GatherDataEvent event) {
-//		ModContainer container = event.getModContainer();
-//		DataGenerator generator = event.getGenerator();
-//		DataOutput output = generator.getPackOutput();
-//		CompletableFuture<RegistryWrapper.WrapperLookup> lookup = event.getLookupProvider();
-
-//		generator.addProvider(event.includeServer(), new AutoLanguageGenerator(container, output, lookup));
-//		generator.addProvider(event.includeServer(), new AutoItemModelGenerator(container, output, lookup));
+	@Override
+	public void onInitializeDataGenerator(FabricDataGenerator generator) {
+		FabricDataGenerator.Pack pack = generator.createPack();
+		pack.addProvider(AutoLanguageGenerator::new);
+		pack.addProvider(AutoLootTableGenerator::new);
 	}
 
 }

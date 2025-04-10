@@ -1,5 +1,5 @@
 plugins {
-	id 'dev.architectury.loom' version '1.7-SNAPSHOT'
+	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -14,57 +14,60 @@ sourceSets {
 	}
 }
 
-repositories {
-	maven { url 'https://maven.neoforged.net/releases' }
-	mavenCentral()
+loom {
+	mods {
+		"euclids-elements" {
+			sourceSet sourceSets.main
+		}
+		"tabula" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.testmod
+		}
+	}
 }
 
-
 dependencies {
-	minecraft "net.minecraft:minecraft:$minecraft_version"
-	mappings loom.layered {
-		it.mappings("net.fabricmc:yarn:$yarn_mappings:v2")
-		it.mappings("dev.architectury:yarn-mappings-patch-neoforge:$yarn_mappings_patch_version")
-	}
-	neoForge "net.neoforged:neoforge:$neoforge_version"
+	minecraft "com.mojang:minecraft:$minecraft_version"
+	mappings "net.fabricmc:yarn:$yarn_mappings:v2"
+	modImplementation "net.fabricmc:fabric-loader:$loader_version"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
 
 	testmodImplementation sourceSets.main.output
 }
 
+fabricApi {
+	configureDataGeneration()
+}
+
 loom {
-	interfaceInjection {
-		enableDependencyInterfaceInjection = true
-	}
+	accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
 	runs {
 		datagen {
-			data()
 			source sourceSets.testmod
-			programArgs("--mod", "$mod_id", "--all", "--output", file("src/generated/resources").absolutePath)
-			ideConfigGenerated(true)
-			runDir("run")
-			name = "Minecraft Datagen"
+			name "Minecraft Datagen"
 		}
 		client {
 			source sourceSets.testmod
-			name = "Minecraft Client"
+			name "Minecraft Client"
 		}
 		server {
 			source sourceSets.testmod
-			name = "Minecraft Server"
+			name "Minecraft Server"
 		}
 	}
+	createRemapConfigurations(sourceSets.testmod)
 }
 
 processResources {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	filesMatching('META-INF/neoforge.mods.toml') {
-		expand project.properties
-	}
+//	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+//	filesMatching("fabric.mod.json") {
+//		expand "mod_version": mod_version
+//	}
 }
 
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
+		create("mavenJava", MavenPublication) {
 			from components.java
 		}
 	}

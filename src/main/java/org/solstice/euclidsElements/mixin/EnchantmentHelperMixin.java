@@ -31,7 +31,6 @@ import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void forEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer) {
+	private static void forEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, consumer);
     }
 
@@ -56,7 +55,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void forEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer) {
+    private static void forEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, slot, entity, consumer);
     }
 
@@ -105,7 +104,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static int getMobExperience(ServerWorld world, @Nullable Entity attacker, Entity target, int base) {
+    public static int getMobExperience(ServerWorld world, Entity attacker, Entity target, int base) {
         if (!(attacker instanceof LivingEntity living)) return base;
 
         MutableFloat result = new MutableFloat((float)base);
@@ -198,7 +197,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void onTargetDamaged(ServerWorld world, Entity target, DamageSource source, @Nullable ItemStack stack) {
+    public static void onTargetDamaged(ServerWorld world, Entity target, DamageSource source, ItemStack stack) {
 		if (target instanceof LivingEntity livingTarget) {
 			EffectHolderHelper.forEachEffectHolder(livingTarget,
                 (effectHolder, level, context) ->
@@ -336,7 +335,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    public static void onHitBlock(ServerWorld world, ItemStack stack, @Nullable LivingEntity user, Entity enchantedEntity, @Nullable EquipmentSlot slot, Vec3d pos, BlockState state, Consumer<Item> onBreak) {
+    public static void onHitBlock(ServerWorld world, ItemStack stack, LivingEntity user, Entity enchantedEntity, EquipmentSlot slot, Vec3d pos, BlockState state, Consumer<Item> onBreak) {
         EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, user, onBreak);
         EffectHolderHelper.forEachEffectHolder(stack, (effectHolder, level) ->
                 effectHolder.value().onHitBlock(world, level, context, enchantedEntity, pos, state)
@@ -496,7 +495,7 @@ public abstract class EnchantmentHelperMixin {
      * @author Solstice
      * @reason Use EffectHolderHelper
      */
-    @Overwrite @Nullable
+    @Overwrite
     public static <T> Pair<T, Integer> getEffectListAndLevel(ItemStack stack, ComponentType<T> componentType) {
         MutableObject<Pair<T, Integer>> result = new MutableObject<>();
         EffectHolderHelper.forEachEffectHolder(stack, (effectHolder, level) -> {

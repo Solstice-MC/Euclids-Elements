@@ -6,14 +6,13 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import org.solstice.euclidsElements.EuclidsElements;
 
 public class EuclidsComponentTypes {
 
-    public static final DeferredRegister<ComponentType<?>> REGISTRY = DeferredRegister
-            .create(Registries.DATA_COMPONENT_TYPE, EuclidsElements.MOD_ID);
+	public static void init() {}
 
 	public static final ComponentType<Identifier> CUSTOM_ITEM_MODEL = register("custom_item_model", Identifier.CODEC);
 
@@ -27,8 +26,7 @@ public class EuclidsComponentTypes {
                 .packetCodec(packetCodec)
                 .cache()
                 .build();
-        REGISTRY.register(name, () -> component);
-        return component;
+		return Registry.register(Registries.DATA_COMPONENT_TYPE, EuclidsElements.of(name), component);
     }
 
 }
