@@ -217,7 +217,7 @@ public interface EffectHolder {
 				if (!flag) {
 					if (locationEffects == null) {
 						locationEffects = new ObjectArraySet<>();
-						user.activeLocationDependentEnchantments().put(this, locationEffects);
+						user.getLocationBasedEffects().put(this, locationEffects);
 					}
 
 					locationEffects.add(locationEffect);

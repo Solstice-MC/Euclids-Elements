@@ -1,36 +1,64 @@
-package org.solstice.euclidsElements.api.autoDataGen.generator;
+package org.solstice.euclidsElements.api.autoDataGen.supplier;
 
-import net.minecraft.data.DataOutput;
-import net.minecraft.data.client.*;
 
-public class AutoModelGenerator extends ModelProvider {
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.*;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
 
-	public AutoModelGenerator(DataOutput output) {
-		super(output);
+public class BlockModelSupplier extends ModelSupplier<Block, BlockStateProvider, BlockModelSupplier.ModelProvider> {
+
+	public static final BlockModelSupplier INSTANCE = new BlockModelSupplier();
+
+	public static void register(Class<? extends Block> clazz, BlockModelSupplier.ModelProvider provider) {
+		INSTANCE.modelProviders.put(clazz, provider);
 	}
 
-//	public AutoModelGenerator(FabricDataOutput output) {
-//		super(output);
-//	}
-//
-//	@FunctionalInterface
-//	public interface BlockStateProvider {
-//		void generate(BlockStateModelGenerator generate, Block block, Identifier id);
-//	}
-//
-//	public static Map<Class<? extends Block>, BlockStateProvider> BLOCK_STATE_PROVIDERS = new LinkedHashMap<>();
-//
-//	static {
+	public static void generate(BlockStateProvider generator, Block block, ResourceLocation id) {
+		INSTANCE.modelProviders.forEach((clazz, provider) -> {
+			if (clazz.isInstance(block)) provider.generate(generator, block, id);
+		});
+	}
+
+	public interface ModelProvider extends ModelSupplier.ModelProvider<Block, BlockStateProvider> {}
+
+	static {
+		register(Block.class, BlockModelSupplier::registerBlock);
+//		register(PillarBlock.class, BlockModelSupplier::registerPillar);
+//		register(SnowBlock.class, BlockModelSupplier::registerLayered);
 //		BLOCK_STATE_PROVIDERS.put(BrazierBlock.class, ACModelProvider::registerBrazier);
 //		BLOCK_STATE_PROVIDERS.put(TankBlock.class, ACModelProvider::registerTank);
 //		BLOCK_STATE_PROVIDERS.put(PipeBlock.class, ACModelProvider::registerPipe);
-//		BLOCK_STATE_PROVIDERS.put(PillarBlock.class, ACModelProvider::registerPillar);
-//		BLOCK_STATE_PROVIDERS.put(SnowBlock.class, ACModelProvider::registerLayered);
 //		BLOCK_STATE_PROVIDERS.put(ClusterBlock.class, ACModelProvider::registerCluster);
-//		BLOCK_STATE_PROVIDERS.put(Block.class, ACModelProvider::registerBlock);
+	}
+
+	public static void registerBlock(BlockStateProvider generator, Block block, ResourceLocation id) {
+		ModelFile model = generator.cubeAll(block);
+		generator.simpleBlock(block, model);
+		generator.simpleBlockItem(block, model);
+	}
+
+//	public static void registerPillar(BlockStateProvider generator, Block block, ResourceLocation id) {
+//		generator.registerAxisRotated(block, TexturedModel.END_FOR_TOP_CUBE_COLUMN, TexturedModel.END_FOR_TOP_CUBE_COLUMN_HORIZONTAL);
+//		generator.registerParentedItemModel(block, id);
 //	}
+
+//	public static void registerLayered(BlockStateProvider generator, Block block, ResourceLocation id) {
+//		ResourceLocation blockId = id.withPrefixedPath("block/");
+//		VariantsBlockStateSupplier supplier = VariantsBlockStateSupplier.create(block).coordinate(BlockStateVariantMap.create(Properties.LAYERS).register(height -> {
+//			BlockStateVariant variant = BlockStateVariant.create();
+//			VariantSetting<ResourceLocation> setting = VariantSettings.MODEL;
+//			ResourceLocation path;
+//			if (height < 8) path = blockId.withSuffixedPath("/height/" + height * 2);
+//			else path = blockId.withSuffixedPath("_block");
 //
-//	public static void registerPipe(BlockStateModelGenerator generator, Block block, Identifier id) {
+//			return variant.put(setting, path);
+//		}));
+//		generator.blockStateCollector.accept(supplier);
+//		generator.registerParentedItemModel(block, blockId.withSuffixedPath("/height/2"));
+//	}
+
+//	public static void registerPipe(BlockStateModelGenerator generator, Block block, ResourceLocation id) {
 //		MultipartBlockStateSupplier supplier = MultipartBlockStateSupplier.create(block)
 //			.with(When.create().set(PipeBlock.UP, true), BlockStateVariant.create().put(VariantSettings.MODEL, id.withSuffixedPath("/positive")).put(VariantSettings.X, VariantSettings.Rotation.R270))
 //			.with(When.create().set(PipeBlock.DOWN, true), BlockStateVariant.create().put(VariantSettings.MODEL, id.withSuffixedPath("/negative")).put(VariantSettings.X, VariantSettings.Rotation.R90))
@@ -40,11 +68,11 @@ public class AutoModelGenerator extends ModelProvider {
 //			.with(When.create().set(PipeBlock.WEST, true), BlockStateVariant.create().put(VariantSettings.MODEL, id.withSuffixedPath("/negative")).put(VariantSettings.Y, VariantSettings.Rotation.R270));
 //
 //		generator.blockStateCollector.accept(supplier);
-//		generator.registerParentedItemModel(block, id);
+//		generator.registerParentedBlockModel(block, id);
 //	}
-//
-//	public static void registerTank(BlockStateModelGenerator generator, Block block, Identifier id) {
-//		Identifier blockId = id.withPrefixedPath("block/");
+
+//	public static void registerTank(BlockStateModelGenerator generator, Block block, ResourceLocation id) {
+//		ResourceLocation blockId = id.withPrefixedPath("block/");
 //
 //		Models.CUBE_COLUMN.upload(
 //			blockId.withSuffixedPath("/default"),
@@ -80,11 +108,11 @@ public class AutoModelGenerator extends ModelProvider {
 //		);
 //
 //		generator.blockStateCollector.accept(supplier);
-//		generator.registerParentedItemModel(block, blockId.withSuffixedPath("/default"));
+//		generator.registerParentedBlockModel(block, blockId.withSuffixedPath("/default"));
 //	}
-//
-//	public static void registerBrazier(BlockStateModelGenerator generator, Block block, Identifier id) {
-//		Identifier blockId = id.withPrefixedPath("block/");
+
+//	public static void registerBrazier(BlockStateModelGenerator generator, Block block, ResourceLocation id) {
+//		ResourceLocation blockId = id.withPrefixedPath("block/");
 //
 //		Model litModel = new Model(
 //			Optional.of(AristotlesComedy.of("block/template/brazier")),
@@ -113,35 +141,15 @@ public class AutoModelGenerator extends ModelProvider {
 //		);
 //
 //		generator.blockStateCollector.accept(supplier);
-//		generator.registerParentedItemModel(block, id);
+//		generator.registerParentedBlockModel(block, id);
 //	}
-//
-//	public static void registerPillar(BlockStateModelGenerator generator, Block block, Identifier id) {
-//		generator.registerAxisRotated(block, TexturedModel.END_FOR_TOP_CUBE_COLUMN, TexturedModel.END_FOR_TOP_CUBE_COLUMN_HORIZONTAL);
-//		generator.registerParentedItemModel(block, id);
-//	}
-//
-//	public static void registerLayered(BlockStateModelGenerator generator, Block block, Identifier id) {
-//		Identifier blockId = id.withPrefixedPath("block/");
-//		VariantsBlockStateSupplier supplier = VariantsBlockStateSupplier.create(block).coordinate(BlockStateVariantMap.create(Properties.LAYERS).register(height -> {
-//			BlockStateVariant variant = BlockStateVariant.create();
-//			VariantSetting<Identifier> setting = VariantSettings.MODEL;
-//			Identifier path;
-//			if (height < 8) path = blockId.withSuffixedPath("/height/" + height * 2);
-//			else path = blockId.withSuffixedPath("_block");
-//
-//			return variant.put(setting, path);
-//		}));
-//		generator.blockStateCollector.accept(supplier);
-//		generator.registerParentedItemModel(block, blockId.withSuffixedPath("/height/2"));
-//	}
-//
-//	public static void registerCluster(BlockStateModelGenerator generator, Block block, Identifier id) {
+
+//	public static void registerCluster(BlockStateModelGenerator generator, Block block, ResourceLocation id) {
 //		BlockStateVariant variant = BlockStateVariant.create()
 //			.put(VariantSettings.MODEL, Models.CROSS.upload(block, TextureMap.cross(block), generator.modelCollector));
 //
 //		BlockStateVariantMap stageVariantMap = BlockStateVariantMap.create(ClusterBlock.STAGE).register(i -> {
-//			Identifier identifier = generator.createSubModel(block, "/" + i, Models.CROSS, TextureMap::cross);
+//			ResourceLocation identifier = generator.createSubModel(block, "/" + i, Models.CROSS, TextureMap::cross);
 //			return BlockStateVariant.create().put(VariantSettings.MODEL, identifier);
 //		});
 //
@@ -152,54 +160,6 @@ public class AutoModelGenerator extends ModelProvider {
 //		generator.blockStateCollector.accept(supplier);
 //
 //		Models.GENERATED.upload(id.withPrefixedPath("item/"), TextureMap.layer0(id.withPrefixedPath("block/").withSuffixedPath("/0")), generator.modelCollector);
-//	}
-//
-//	public static void registerBlock(BlockStateModelGenerator generator, Block block, Identifier id) {
-//		generator.registerSimpleCubeAll(block);
-//		generator.registerParentedItemModel(block, id.withPrefixedPath("block/"));
-//	}
-//
-//	@Override
-//	public void generateBlockStateModels(BlockStateModelGenerator generator) {
-//		Registries.BLOCK.streamEntries()
-//			.filter(AristotlesComedyDataGenerator::ownsRegistry)
-//			.forEach(entry -> this.generateBlockModel(generator, entry));
-//	}
-//
-//	public void generateBlockModel(BlockStateModelGenerator generator, RegistryEntry<Block> entry) {
-//		Block block = entry.value();
-//		Identifier id = entry.getKeyOrValue().left().orElseThrow().getValue();
-//
-//		for (Map.Entry<Class<? extends Block>, BlockStateProvider> mapEntry : BLOCK_STATE_PROVIDERS.entrySet()) {
-//			Class<? extends Block> clazz = mapEntry.getKey();
-//			BlockStateProvider provider = mapEntry.getValue();
-//			if (clazz.isInstance(block)) {
-//				provider.generate(generator, block, id);
-//				break;
-//			}
-//		}
-//
-////		if (block.getClass() == Block.class) {
-////			generator.registerSimpleCubeAll(block);
-////			generator.registerParentedItemModel(block, id);
-////		}
-//	}
-//
-//	@Override
-//	public void generateItemModels(ItemModelGenerator generator) {
-//		Registries.ITEM.streamEntries()
-//			.filter(AristotlesComedyDataGenerator::ownsRegistry)
-//			.forEach(entry -> this.generateItemModel(generator, entry));
-//	}
-//
-//	public void generateItemModel(ItemModelGenerator generator, RegistryEntry<Item> entry) {
-//		Item item = entry.value();
-//
-//		if (item instanceof ToolItem) {
-//			generator.register(item, Models.HANDHELD);
-//		} else if (item.getClass() == Item.class) {
-//			generator.register(item, Models.GENERATED);
-//		}
 //	}
 
 }

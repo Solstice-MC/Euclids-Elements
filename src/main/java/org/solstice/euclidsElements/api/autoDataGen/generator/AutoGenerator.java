@@ -1,13 +1,18 @@
 package org.solstice.euclidsElements.api.autoDataGen.generator;
 
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
+import net.neoforged.fml.ModContainer;
 
 public interface AutoGenerator {
 
-	String getModId();
+	ModContainer getContainer();
 
-	default boolean ownsEntry(RegistryEntry<?> entry) {
-		return entry.getKey().orElseThrow().getValue().getNamespace().equals(this.getModId());
+	default String getModId() {
+		return this.getContainer().getModId();
+	}
+
+	default boolean ownsEntry(Holder<?> entry) {
+		return entry.getKey().location().getNamespace().equals(this.getModId());
 	}
 
 }

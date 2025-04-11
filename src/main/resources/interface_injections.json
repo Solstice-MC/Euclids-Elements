@@ -1,6 +1,6 @@
 {
 	"net/minecraft/world/item/enchantment/Enchantment": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolder" ],
-	"net/minecraft/world/item/enchantment/Enchantment$Definition": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolder$Definition" ],
+	"net/minecraft/world/item/enchantment/Enchantment$EnchantmentDefinition": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolder$Definition" ],
 	"net/minecraft/world/item/enchantment/ItemEnchantments": [ "org/solstice/euclidsElements/api/effectHolder/item/component/EffectHolderComponent<net.minecraft.world.item.enchantment.Enchantment>" ],
 	"net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolderHelper$Consumer" ],
 	"net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolderHelper$ContextAwareConsumer" ],

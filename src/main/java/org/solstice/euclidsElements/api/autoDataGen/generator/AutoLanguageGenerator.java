@@ -1,29 +1,26 @@
 package org.solstice.euclidsElements.api.autoDataGen.generator;
 
-import net.minecraft.data.DataOutput;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModContainer;
 import org.solstice.euclidsElements.api.autoDataGen.provider.EuclidsLanguageProvider;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class AutoLanguageGenerator extends EuclidsLanguageProvider implements AutoGenerator {
 
-	public static final List<RegistryKey<?>> REGISTRY_BLACKLIST = List.of(
-		RegistryKeys.RECIPE_SERIALIZER,
-		RegistryKeys.BIOME
+	public static final List<ResourceKey<?>> REGISTRY_BLACKLIST = List.of(
+		Registries.RECIPE_SERIALIZER,
+		Registries.BIOME
 	);
 
-	public static boolean keyIsNotBlacklisted(RegistryKey<?> key) {
+	public static boolean keyIsNotBlacklisted(ResourceKey<?> key) {
 		return !REGISTRY_BLACKLIST.contains(key);
 	}
 
@@ -31,57 +28,39 @@ public class AutoLanguageGenerator extends EuclidsLanguageProvider implements Au
 		return str.substring(0,1).toUpperCase() + str.substring(1);
 	}
 
-	public AutoLanguageGenerator(ModContainer container, DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> lookup) {
+	@Override
+	public ModContainer getContainer() {
+		return this.container;
+	}
+
+	public AutoLanguageGenerator(ModContainer container, PackOutput output, CompletableFuture<HolderLookup.Provider> lookup) {
 		super(container, output, lookup);
 	}
 
-	@Override
-	public String getModId() {
-		return this.container.getModId();
+	protected void addTranslations(HolderLookup.Provider lookup) {
+		this.generateRegistryTranslations(lookup);
 	}
 
-	@Override
-	public void addTranslations(RegistryWrapper.WrapperLookup lookup) {
-		generateRegistryTranslations(lookup);
-		generateTagTranslations(lookup);
-	}
-
-	public void generateRegistryTranslations(RegistryWrapper.WrapperLookup lookup) {
-		lookup.streamAllRegistryKeys()
+	public void generateRegistryTranslations(HolderLookup.Provider lookup) {
+		lookup.listRegistries()
 			.filter(AutoLanguageGenerator::keyIsNotBlacklisted)
-			.map(lookup::getOptionalWrapper)
+			.map(lookup::lookup)
 			.filter(Optional::isPresent)
 			.map(Optional::get)
-			.forEach(wrapper -> wrapper.streamEntries()
+			.forEach(wrapper -> wrapper.listElements()
 				.filter(this::ownsEntry)
 				.forEach(this::generateEntryTranslation)
 			);
 	}
 
-	public void generateEntryTranslation(RegistryEntry<?> entry) {
-		RegistryKey<?> registryKey = entry.getKey().orElse(null);
+	public void generateEntryTranslation(Holder<?> entry) {
+		ResourceKey<?> registryKey = entry.getKey();
 		if (registryKey == null) return;
 
-		Identifier id = registryKey.getValue();
-		String dataType = registryKey.getRegistry().getPath();
+		ResourceLocation id = registryKey.location();
+		String dataType = registryKey.registry().getPath();
 		if (dataType.endsWith("_type")) dataType = dataType.split("_type")[0];
-		String key = id.toTranslationKey(dataType);
-		String translation = Arrays
-			.stream(id.getPath().split("([_.])"))
-			.map(AutoLanguageGenerator::toUpperCase)
-			.collect(Collectors.joining(" "));
-		this.add(key, translation);
-	}
-
-	public void generateTagTranslations(RegistryWrapper.WrapperLookup lookup) {
-		lookup.streamAllRegistryKeys().forEach(sKey ->
-			lookup.getWrapperOrThrow(sKey).streamTagKeys().forEach(this::generateTagTranslation)
-		);
-	}
-
-	public void generateTagTranslation(TagKey<?> tag) {
-		Identifier id = tag.id();
-		String key = id.toTranslationKey("tag." + tag.registry().getValue().getPath());
+		String key = id.toLanguageKey(dataType);
 		String translation = Arrays
 			.stream(id.getPath().split("([_.])"))
 			.map(AutoLanguageGenerator::toUpperCase)

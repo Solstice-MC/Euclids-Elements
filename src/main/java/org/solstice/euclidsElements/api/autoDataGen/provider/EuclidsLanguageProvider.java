@@ -1,31 +1,31 @@
 package org.solstice.euclidsElements.api.autoDataGen.provider;
 
 import com.google.gson.JsonObject;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.PackOutput;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.neoforge.common.Tags;
 
-import java.io.DataOutput;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 public abstract class EuclidsLanguageProvider implements DataProvider {
 
 	@Override
 	public String getName() {
-		return "Translations for mod: " + this.getModId();
+		return "Euclid's Translations for " + this.container.getModId();
 	}
 
-	protected final DataOutput output;
-	protected final CompletableFuture<RegistryWrapper.WrapperLookup> lookupFuture;
+	protected final PackOutput output;
+	protected final CompletableFuture<HolderLookup.Provider> lookupFuture;
 	protected final ModContainer container;
 
 	protected final Map<String, String> data = new TreeMap<>();
 
-	public EuclidsLanguageProvider(ModContainer container, DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> lookup) {
+	public EuclidsLanguageProvider(ModContainer container, PackOutput output, CompletableFuture<HolderLookup.Provider> lookup) {
 		this.output = output;
 		this.lookupFuture = lookup;
 		this.container = container;
@@ -35,77 +35,29 @@ public abstract class EuclidsLanguageProvider implements DataProvider {
 		return this.container.getModId() + "-datagen";
 	}
 
-	protected abstract void addTranslations(RegistryWrapper.WrapperLookup lookup);
+	protected abstract void addTranslations(HolderLookup.Provider lookup);
 
 	@Override
-	public CompletableFuture<?> run(DataWriter writer) {
+	public CompletableFuture<?> run(CachedOutput writer) {
 		return this.lookupFuture.thenCompose((registryLookup) -> this.run(writer, registryLookup));
 	}
 
-	protected CompletableFuture<?> run(DataWriter writer, RegistryWrapper.WrapperLookup lookup) {
+	protected CompletableFuture<?> run(CachedOutput writer, HolderLookup.Provider lookup) {
 		this.addTranslations(lookup);
-
-		if (!data.isEmpty())
-			return save(writer, this.output.resolvePath(DataOutput.OutputType.RESOURCE_PACK).resolve(this.getModId()).resolve("lang").resolve("en_us.json"));
-
-		return CompletableFuture.allOf();
+		if (this.data.isEmpty()) return CompletableFuture.allOf();
+		return save(writer, this.output.getOutputFolder(PackOutput.Target.RESOURCE_PACK)
+			.resolve(this.getModId())
+			.resolve("lang")
+			.resolve("en_us.json")
+		);
 	}
 
-	protected CompletableFuture<?> save(DataWriter cache, Path target) {
-		// TODO: DataProvider.saveStable handles the caching and hashing already, but creating the JSON Object this way seems unreliable. -C
+	protected CompletableFuture<?> save(CachedOutput cache, Path target) {
 		JsonObject json = new JsonObject();
 		this.data.forEach(json::addProperty);
-
-		return DataProvider.writeToPath(cache, json, target);
+		return DataProvider.saveStable(cache, json, target);
 	}
 
-	public void addBlock(Supplier<? extends Block> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(Block key, String name) {
-		add(key.getTranslationKey(), name);
-	}
-
-	public void addItem(Supplier<? extends Item> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(Item key, String name) {
-		add(key.getTranslationKey(), name);
-	}
-
-	public void addItemStack(Supplier<ItemStack> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(ItemStack key, String name) {
-		add(key.getTranslationKey(), name);
-	}
-
-	public void addEffect(Supplier<? extends StatusEffect> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(StatusEffect key, String name) {
-		add(key.getTranslationKey(), name);
-	}
-
-	public void addEntityType(Supplier<? extends EntityType<?>> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(EntityType<?> key, String name) {
-		add(key.getTranslationKey(), name);
-	}
-
-	public void addTag(Supplier<? extends TagKey<?>> key, String name) {
-		add(key.get(), name);
-	}
-
-	public void add(TagKey<?> tagKey, String name) {
-		add(Tags.getTagTranslationKey(tagKey), name);
-	}
 
 	public void add(String key, String value) {
 		if (data.put(key, value) != null)

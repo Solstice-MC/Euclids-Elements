@@ -1,42 +1,40 @@
 package org.solstice.euclidsElements.api.autoDataGen.generator;
 
-import net.minecraft.data.DataOutput;
-import net.minecraft.data.client.Models;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.neoforged.fml.ModContainer;
-import org.solstice.euclidsElements.api.autoDataGen.provider.EuclidsItemModelProvider;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import org.solstice.euclidsElements.api.autoDataGen.supplier.ItemModelSupplier;
 
-import java.util.concurrent.CompletableFuture;
+public class AutoItemModelGenerator extends ItemModelProvider implements AutoGenerator {
 
-public class AutoItemModelGenerator extends EuclidsItemModelProvider implements AutoGenerator {
+	@Override
+	public ModContainer getContainer() {
+		return this.container;
+	}
 
-	public AutoItemModelGenerator(ModContainer container, DataOutput output, CompletableFuture<RegistryWrapper.WrapperLookup> lookup) {
-		super(container, output, lookup);
+	protected final ModContainer container;
+
+	public AutoItemModelGenerator(ModContainer container, PackOutput output, ExistingFileHelper exFileHelper) {
+		super(output, container.getModId(), exFileHelper);
+		this.container = container;
 	}
 
 	@Override
-	public String getModId() {
-		return this.container.getModId();
-	}
-
-	@Override
-	protected void registerModels(RegistryWrapper.WrapperLookup lookup) {
-		lookup.getWrapperOrThrow(RegistryKeys.ITEM)
-			.streamEntries()
+	protected void registerModels() {
+		BuiltInRegistries.ITEM.holders()
 			.filter(this::ownsEntry)
-			.forEach(this::registerModel);
-
-		this.register(Identifier.of("test"), Models.CARPET);
+			.forEach(this::generateItemModel);
 	}
 
-	protected void registerModel(RegistryEntry<Item> entry) {
-		Identifier id = entry.getKey().orElseThrow().getValue();
+	public void generateItemModel(Holder<Item> entry) {
 		Item item = entry.value();
-		this.register(id, Models.GENERATED);
+		ResourceLocation id = entry.getKey().location();
+		ItemModelSupplier.generate(this, item, id);
 	}
 
 }

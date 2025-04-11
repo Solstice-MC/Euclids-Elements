@@ -27,12 +27,6 @@ neoForge {
 		from file("src/main/resources/interface_injections.json")
 	}
 
-//	interfaceInjectionData.from(file("src/main/resources/interface_injections.json"))
-
-//	interfaceInjectionData {
-//		publish file("src/main/resources/interface_injections.json")
-//	}
-
 	parchment {
 		mappingsVersion = parchment_mappings_version
 		minecraftVersion = minecraft_version
@@ -42,23 +36,20 @@ neoForge {
 		client {
 			client()
 		}
-
 		server {
 			server()
 		}
-
 		data {
 			data()
-
-			// example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
-			// gameDirectory = project.file('run-data')
-
-			// Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
 			programArguments.addAll(
-				'--mod', project.mod_id,
+				'--mod', 'tabula',
 				'--all',
-				'--output', file('src/generated/resources/').getAbsolutePath()
+				'--output', file('src/generated/resources/').getAbsolutePath(),
+				'--existing', file('src/main/resources/').getAbsolutePath()
 			)
+		}
+		configureEach {
+			sourceSet = sourceSets.testmod
 		}
 	}
 

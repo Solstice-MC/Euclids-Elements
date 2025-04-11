@@ -20,7 +20,6 @@ public class EuclidsElements {
     public EuclidsElements(IEventBus bus) {
 		EuclidsComponents.REGISTRY.register(bus);
 		org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects.REGISTRY.register(bus);
-		VanillaTradeOfferTypes.REGISTRY.register(bus);
 	}
 
 }
