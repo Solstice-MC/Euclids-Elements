@@ -18,7 +18,11 @@ public class TabulaBlocks {
 
 	public static void init() {}
 
-	public static final Block RED_TRISMEGISTITE_BLOCK = register("red_trismegistite_block", AbstractBlock.Settings.copy(Blocks.AMETHYST_BLOCK));
+	public static final Block RED_SOUL_SAND = register("red_soul_sand");
+
+	public static Block register(String name) {
+		return register(name, Block::new, AbstractBlock.Settings.create());
+	}
 
 	public static Block register(String name, AbstractBlock.Settings settings) {
 		return register(name, Block::new, settings);

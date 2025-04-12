@@ -9,3 +9,4 @@ accessible method net/minecraft/enchantment/Enchantment createHitBlockLootContex
 accessible method net/minecraft/enchantment/Enchantment createEnchantedItemLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/item/ItemStack;)Lnet/minecraft/loot/context/LootContext;
 accessible method net/minecraft/enchantment/Enchantment createEnchantedLocationLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/entity/Entity;Z)Lnet/minecraft/loot/context/LootContext;
 
+extendable method net/fabricmc/fabric/api/datagen/v1/provider/FabricLanguageProvider getLangFilePath (Ljava/lang/String;)Ljava/nio/file/Path;

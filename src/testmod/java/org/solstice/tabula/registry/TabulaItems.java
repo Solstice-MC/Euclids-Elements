@@ -14,7 +14,7 @@ public class TabulaItems {
 
 	public static void init() {}
 
-	public static final Item TIN_NUGGET = register("tin_nugget");
+	public static final Item EMERALD_TABLET = register("emerald_tablet");
 
 	public static Item register(String name) {
 		return register(name, Item::new);

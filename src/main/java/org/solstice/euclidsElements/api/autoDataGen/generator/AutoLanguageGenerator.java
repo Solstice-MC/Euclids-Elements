@@ -3,12 +3,14 @@ package org.solstice.euclidsElements.api.autoDataGen.generator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.data.DataOutput;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -36,10 +38,9 @@ public class AutoLanguageGenerator extends FabricLanguageProvider implements Aut
 	}
 
 	@Override
-	public ModContainer getContainer() {
-		return this.dataOutput.getModContainer();
+	public String getModId() {
+		return this.dataOutput.getModContainer().getMetadata().getId();
 	}
-
 
 	@Override
 	public void generateTranslations(RegistryWrapper.WrapperLookup lookup, TranslationBuilder builder) {

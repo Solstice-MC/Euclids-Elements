@@ -11,13 +11,16 @@ import java.util.concurrent.CompletableFuture;
 
 public class AutoLootTableGenerator extends FabricBlockLootTableProvider implements AutoGenerator {
 
+	protected final FabricDataOutput dataOutput;
+
 	public AutoLootTableGenerator(FabricDataOutput dataOutput, CompletableFuture<RegistryWrapper.WrapperLookup> registryLookup) {
 		super(dataOutput, registryLookup);
+		this.dataOutput = dataOutput;
 	}
 
 	@Override
-	public ModContainer getContainer() {
-		return null;
+	public String getModId() {
+		return this.dataOutput.getModContainer().getMetadata().getId();
 	}
 
 	@Override

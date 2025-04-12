@@ -25,8 +25,8 @@ public class AutoItemModelGenerator extends FabricModelProvider implements AutoG
 	}
 
 	@Override
-	public ModContainer getContainer() {
-		return this.output.getModContainer();
+	public String getModId() {
+		return this.output.getModContainer().getMetadata().getId();
 	}
 
 	@Override
