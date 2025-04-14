@@ -1,12 +1,13 @@
 accessWidener v2 named
 
+accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/item/ItemStack;Lnet/minecraft/enchantment/EnchantmentHelper$Consumer;)V
+accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer;)V
+#accessible method net/minecraft/enchantment/EnchantmentHelper forEachEnchantment (Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer;)V
+
 accessible class net/minecraft/enchantment/EnchantmentHelper$Consumer
 accessible class net/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer
-extendable class net/fabricmc/fabric/api/datagen/v1/FabricDataGenerator
 
 accessible method net/minecraft/enchantment/Enchantment createEnchantedEntityLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/loot/context/LootContext;
 accessible method net/minecraft/enchantment/Enchantment createHitBlockLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/entity/Entity;Lnet/minecraft/util/math/Vec3d;Lnet/minecraft/block/BlockState;)Lnet/minecraft/loot/context/LootContext;
 accessible method net/minecraft/enchantment/Enchantment createEnchantedItemLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/item/ItemStack;)Lnet/minecraft/loot/context/LootContext;
 accessible method net/minecraft/enchantment/Enchantment createEnchantedLocationLootContext (Lnet/minecraft/server/world/ServerWorld;ILnet/minecraft/entity/Entity;Z)Lnet/minecraft/loot/context/LootContext;
-
-extendable method net/fabricmc/fabric/api/datagen/v1/provider/FabricLanguageProvider getLangFilePath (Ljava/lang/String;)Ljava/nio/file/Path;

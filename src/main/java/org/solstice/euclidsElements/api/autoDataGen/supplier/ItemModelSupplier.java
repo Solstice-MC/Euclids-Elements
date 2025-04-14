@@ -18,8 +18,6 @@ public class ItemModelSupplier extends ModelSupplier<Item, ItemModelGenerator, I
 	}
 
 	public static void generate(ItemModelGenerator generator, Item item, Identifier id) {
-		System.out.println("loop started");
-
 		for (Map.Entry<Class<? extends Item>, ItemModelSupplier.ModelProvider> entry : INSTANCE.modelProviders) {
 			Class<? extends Item> clazz = entry.getKey();
 			ItemModelSupplier.ModelProvider provider = entry.getValue();

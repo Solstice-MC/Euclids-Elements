@@ -31,24 +31,4 @@ public class EnchantmentMixin implements EffectHolder {
         return this.definition;
     }
 
-    @Redirect(
-            method = "getName",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/text/Texts;setStyleIfAbsent(Lnet/minecraft/text/MutableText;Lnet/minecraft/text/Style;)Lnet/minecraft/text/MutableText;",
-                    ordinal = 1
-            )
-    )
-    private static MutableText enchantmentColor (
-            MutableText style,
-            Style component,
-            @Local MutableText result,
-            @Local(argsOnly = true) RegistryEntry<Enchantment> enchantment,
-            @Local(argsOnly = true) int level
-    ) {
-        if (level >= enchantment.value().getMaxLevel()) Texts.setStyleIfAbsent(result, Style.EMPTY.withColor(Formatting.LIGHT_PURPLE));
-        else Texts.setStyleIfAbsent(result, Style.EMPTY.withColor(Formatting.BLUE));
-        return null;
-    }
-
 }

@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
 import org.solstice.euclidsElements.api.event.ExtraServerLifecycleEvents;
+import org.solstice.euclidsElements.registry.EuclidsComponentTypes;
+import org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects;
+import org.solstice.euclidsElements.registry.EuclidsRegistries;
 
 public class EuclidsElements implements ModInitializer {
 
@@ -18,6 +21,9 @@ public class EuclidsElements implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		EuclidsComponentTypes.init();
+		EuclidsEnchantmentEffects.init();
+		EuclidsRegistries.init();
 //		EuclidsComponentTypes.REGISTRY.register(bus);
 //		EuclidsEnchantmentEffects.REGISTRY.register(bus);
 //		VanillaTradeOfferTypes.REGISTRY.register(bus);

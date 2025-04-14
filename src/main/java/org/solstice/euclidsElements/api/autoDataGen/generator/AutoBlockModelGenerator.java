@@ -11,6 +11,11 @@ import org.solstice.euclidsElements.api.autoDataGen.supplier.BlockModelSupplier;
 
 public class AutoBlockModelGenerator extends FabricModelProvider implements AutoGenerator {
 
+	@Override
+	public String getName() {
+		return "Block Model Definitions";
+	}
+
 	private final FabricDataOutput output;
 
 	public AutoBlockModelGenerator(FabricDataOutput output) {

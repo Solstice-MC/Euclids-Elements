@@ -11,20 +11,9 @@ sourceSets {
 	testmod {
 		compileClasspath += main.compileClasspath
 		runtimeClasspath += main.runtimeClasspath
+		resources.srcDirs += [ 'src/testmod/generated' ]
 	}
 }
-
-//loom {
-//	mods {
-//		"euclids-elements" {
-//			sourceSet sourceSets.main
-//		}
-//		"tabula" {
-//			sourceSet sourceSets.main
-//			sourceSet sourceSets.testmod
-//		}
-//	}
-//}
 
 dependencies {
 	minecraft "com.mojang:minecraft:$minecraft_version"
@@ -36,16 +25,20 @@ dependencies {
 }
 
 fabricApi {
-	configureDataGeneration()
+	configureDataGeneration {
+		outputDirectory = file("src/testmod/generated")
+		addToResources = false
+		strictValidation = true
+	}
+}
+
+runDatagen {
+	outputs.dir("src/testmod/generated")
 }
 
 loom {
 	accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
 	runs {
-		datagen {
-			source sourceSets.testmod
-			name "Minecraft Datagen"
-		}
 		client {
 			source sourceSets.testmod
 			name "Minecraft Client"
@@ -54,15 +47,20 @@ loom {
 			source sourceSets.testmod
 			name "Minecraft Server"
 		}
+		datagen {
+			source sourceSets.testmod
+			name "Data Generation"
+			ideConfigGenerated = true
+		}
 	}
 	createRemapConfigurations(sourceSets.testmod)
 }
 
 processResources {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-//	filesMatching("fabric.mod.json") {
-//		expand "mod_version": mod_version
-//	}
+	filesMatching("fabric.mod.json") {
+		expand project.properties
+	}
 }
 
 publishing {

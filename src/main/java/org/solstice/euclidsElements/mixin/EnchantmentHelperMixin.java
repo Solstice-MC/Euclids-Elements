@@ -46,7 +46,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-	private static void forEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer) {
+	public static void forEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, consumer);
     }
 
@@ -55,7 +55,7 @@ public abstract class EnchantmentHelperMixin {
      * @reason Use EffectHolderHelper
      */
     @Overwrite
-    private static void forEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer) {
+	public static void forEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer) {
         EffectHolderHelper.forEachEffectHolder(stack, slot, entity, consumer);
     }
 

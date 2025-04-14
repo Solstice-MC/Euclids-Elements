@@ -17,6 +17,11 @@ import org.solstice.euclidsElements.api.autoDataGen.supplier.ItemModelSupplier;
 
 public class AutoItemModelGenerator extends FabricModelProvider implements AutoGenerator {
 
+	@Override
+	public String getName() {
+		return "Item Model Definitions";
+	}
+
 	private final FabricDataOutput output;
 
 	public AutoItemModelGenerator(FabricDataOutput output) {
