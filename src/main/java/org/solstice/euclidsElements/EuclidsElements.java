@@ -24,9 +24,6 @@ public class EuclidsElements implements ModInitializer {
 		EuclidsComponentTypes.init();
 		EuclidsEnchantmentEffects.init();
 		EuclidsRegistries.init();
-//		EuclidsComponentTypes.REGISTRY.register(bus);
-//		EuclidsEnchantmentEffects.REGISTRY.register(bus);
-//		VanillaTradeOfferTypes.REGISTRY.register(bus);
 		ExtraServerLifecycleEvents.AFTER_RESOURCES_LOADED.register(EffectHolderHelper::initializeEffectHolderComponents);
 	}
 

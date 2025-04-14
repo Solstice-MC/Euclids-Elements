@@ -8,7 +8,8 @@
 		"EnchantmentMixin",
 		"ItemEnchantmentsComponentMixin",
 		"ItemStackMixin",
-		"LivingEntityMixin"
+		"LivingEntityMixin",
+		"MinecraftServerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
