@@ -66,6 +66,7 @@ processResources {
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
+			artifactId "euclids-elements"
 			from components.java
 		}
 	}

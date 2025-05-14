@@ -7,6 +7,8 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import org.solstice.tabula.Tabula;
+import org.solstice.tabula.content.item.HumorCheckerItem;
+import org.solstice.tabula.content.item.PlayerHumorCheckerItem;
 
 import java.util.function.Function;
 
@@ -14,7 +16,8 @@ public class TabulaItems {
 
 	public static void init() {}
 
-	public static final Item EMERALD_TABLET = register("emerald_tablet");
+	public static final Item POCKET_MIRROR = register("pocket_mirror", PlayerHumorCheckerItem::new);
+	public static final Item EMERALD_TABLET = register("emerald_tablet", HumorCheckerItem::new);
 
 	public static Item register(String name) {
 		return register(name, Item::new);

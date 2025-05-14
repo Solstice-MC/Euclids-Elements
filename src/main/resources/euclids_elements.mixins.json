@@ -6,10 +6,14 @@
 		"EnchantmentDefinitionMixin",
 		"EnchantmentHelperMixin",
 		"EnchantmentMixin",
+		"EntityMixin",
 		"ItemEnchantmentsComponentMixin",
 		"ItemStackMixin",
 		"LivingEntityMixin",
-		"MinecraftServerMixin"
+		"MinecraftServerMixin",
+		"RegistryBuilderMixin",
+		"RegistryEntryMixin",
+		"SimpleRegistryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

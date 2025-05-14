@@ -5,6 +5,7 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.solstice.tabula.registry.TabulaBlocks;
+import org.solstice.tabula.registry.TabulaComponentTypes;
 import org.solstice.tabula.registry.TabulaItems;
 
 public class Tabula implements ModInitializer {
@@ -20,6 +21,7 @@ public class Tabula implements ModInitializer {
 	public void onInitialize() {
 		TabulaItems.init();
 		TabulaBlocks.init();
+		TabulaComponentTypes.init();
 	}
 
 }

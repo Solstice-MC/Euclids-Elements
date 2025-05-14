@@ -1,11 +1,15 @@
 package org.solstice.euclidsElements;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.server.DataPackContents;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.solstice.euclidsElements.api.effectHolder.EffectHolderHelper;
 import org.solstice.euclidsElements.api.event.ExtraServerLifecycleEvents;
+import org.solstice.euclidsElements.api.mapTag.MapTagLoader;
 import org.solstice.euclidsElements.registry.EuclidsComponentTypes;
 import org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects;
 import org.solstice.euclidsElements.registry.EuclidsRegistries;
@@ -25,6 +29,9 @@ public class EuclidsElements implements ModInitializer {
 		EuclidsEnchantmentEffects.init();
 		EuclidsRegistries.init();
 		ExtraServerLifecycleEvents.AFTER_RESOURCES_LOADED.register(EffectHolderHelper::initializeEffectHolderComponents);
+		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(MapTagLoader.ID, registries ->
+			new MapTagLoader(((DataPackContents.ConfigurableWrapperLookup)registries).dynamicRegistryManager)
+		);
 	}
 
 }
