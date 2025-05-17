@@ -1,0 +1,12 @@
+loom {
+	accessWidenerPath = file("src/main/resources/euclids-effect-holder-api.accesswidener")
+}
+
+//loom {
+//	mods {
+//		"tabula-effect-holder-api" {
+//			sourceSet sourceSets.testmod
+//		}
+//	}
+//}
+

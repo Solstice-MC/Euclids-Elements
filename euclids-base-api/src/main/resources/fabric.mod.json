@@ -1,0 +1,16 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-base-api",
+	"version": "${module_version}",
+
+	"name": "Euclid's Base API",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [ "org.solstice.euclidsElements.EuclidsElements" ]
+	},
+	"mixins": [ "euclids-base-api.mixins.json" ],
+	"custom": {
+		"loom:injected_interfaces": {}
+	}
+}

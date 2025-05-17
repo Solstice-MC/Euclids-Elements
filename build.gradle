@@ -1,74 +1,110 @@
 plugins {
+	id 'java'
 	id 'fabric-loom' version '1.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
 base.archivesName = mod_id
-group = mod_group
 version = mod_version
 
-sourceSets {
-	testmod {
-		compileClasspath += main.compileClasspath
-		runtimeClasspath += main.runtimeClasspath
-		resources.srcDirs += [ 'src/testmod/generated' ]
+//fabricApi {
+//	configureDataGeneration {
+//		outputDirectory = file("src/testmod/generated")
+//		addToResources = false
+//		strictValidation = true
+//	}
+//}
+
+//runDatagen {
+//	outputs.dir("src/testmod/generated")
+//}
+
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'maven-publish'
+	apply plugin: 'fabric-loom'
+
+	group = mod_group
+
+	sourceSets {
+		testmod {
+			compileClasspath += main.compileClasspath
+			runtimeClasspath += main.runtimeClasspath
+			resources.srcDirs += [ 'src/testmod/generated' ]
+		}
 	}
+
+	loom {
+		runs {
+			client {
+				source sourceSets.testmod
+				name "Minecraft Client"
+			}
+			server {
+				source sourceSets.testmod
+				name "Minecraft Server"
+			}
+//			datagen {
+//				source sourceSets.testmod
+//				name "Data Generation"
+//				ideConfigGenerated = true
+//			}
+		}
+		mixin {
+			useLegacyMixinAp = true
+		}
+		interfaceInjection {
+			enableDependencyInterfaceInjection = true
+		}
+		enableTransitiveAccessWideners = true
+		createRemapConfigurations(sourceSets.testmod)
+	}
+
+	dependencies {
+		minecraft "com.mojang:minecraft:${minecraft_version}"
+		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+		testmodImplementation sourceSets.main.output
+	}
+
+	java {
+		withSourcesJar()
+	}
+
+	tasks.withType(ProcessResources).configureEach {
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+		filesMatching("fabric.mod.json") {
+			expand project.properties
+		}
+	}
+}
+
+subprojects {
+	base.archivesName = project.name
+	version = module_version
+
+	dependencies {
+		if (project.name != "euclids-base-api") api project(path: ":euclids-base-api", configuration: 'namedElements')
+	}
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+//				groupId project.mod_group
+				from components.java
+			}
+		}
+	}
+	tasks.build.finalizedBy publishToMavenLocal
 }
 
 dependencies {
-	minecraft "com.mojang:minecraft:$minecraft_version"
-	mappings "net.fabricmc:yarn:$yarn_mappings:v2"
-	modImplementation "net.fabricmc:fabric-loader:$loader_version"
-	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
-
-	testmodImplementation sourceSets.main.output
-}
-
-fabricApi {
-	configureDataGeneration {
-		outputDirectory = file("src/testmod/generated")
-		addToResources = false
-		strictValidation = true
-	}
-}
-
-runDatagen {
-	outputs.dir("src/testmod/generated")
-}
-
-loom {
-	accessWidenerPath = file("src/main/resources/${mod_id}.accesswidener")
-	runs {
-		client {
-			source sourceSets.testmod
-			name "Minecraft Client"
-		}
-		server {
-			source sourceSets.testmod
-			name "Minecraft Server"
-		}
-		datagen {
-			source sourceSets.testmod
-			name "Data Generation"
-			ideConfigGenerated = true
-		}
-	}
-	createRemapConfigurations(sourceSets.testmod)
-}
-
-processResources {
-	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-	filesMatching("fabric.mod.json") {
-		expand project.properties
-	}
-}
-
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId "euclids-elements"
-			from components.java
+	afterEvaluate {
+		subprojects.each {
+			implementation project(path: ":${it.path}", configuration: "namedElements")
+			testmodImplementation project(":${it.path}").sourceSets.testmod.output
+			include project(path: ":${it.path}", configuration: "namedElements")
 		}
 	}
 }
-tasks.build.finalizedBy publishToMavenLocal

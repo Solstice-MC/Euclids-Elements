@@ -7,3 +7,12 @@ pluginManagement {
 }
 
 rootProject.name = "Euclid's Elements"
+
+include (
+	'euclids-base-api',
+	'euclids-map-tag-api',
+	'euclids-effect-holder-api',
+	'euclids-component-holder-api',
+	'euclids-advancement-api',
+	'euclids-auto-datagen-api',
+)

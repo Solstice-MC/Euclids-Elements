@@ -13,28 +13,6 @@
 	"license": "LGPL-3.0",
 	"icon": "assets/euclids_elements/icon.png",
 
-	"environment": "*",
-	"entrypoints": {
-		"main": [ "org.solstice.euclidsElements.EuclidsElements" ]
-	},
-	"mixins": [ "euclids_elements.mixins.json" ],
-	"accessWidener": "euclids_elements.accesswidener",
-	"custom": {
-		"loom:injected_interfaces": {
-			"net/minecraft/enchantment/Enchantment": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolder" ],
-			"net/minecraft/enchantment/Enchantment\u0024Definition": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolder\u0024Definition" ],
-			"net/minecraft/component/type/ItemEnchantmentsComponent": [ "org/solstice/euclidsElements/api/effectHolder/item/component/EffectHolderComponent<Lnet/minecraft/enchantment/Enchantment;>" ],
-			"net/minecraft/enchantment/EnchantmentHelper\u0024Consumer": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolderHelper\u0024Consumer" ],
-			"net/minecraft/enchantment/EnchantmentHelper\u0024ContextAwareConsumer": [ "org/solstice/euclidsElements/api/effectHolder/EffectHolderHelper\u0024ContextAwareConsumer" ],
-			"net/minecraft/entity/LivingEntity": [ "org/solstice/euclidsElements/api/effectHolder/entity/EntityEffectHolderData" ],
-
-			"net/minecraft/registry/Registry": [ "org/solstice/euclidsElements/api/mapTag/registry/MapTagRegistryHolder<TT;>" ],
-			"net/minecraft/registry/entry/RegistryEntry": [ "org/solstice/euclidsElements/api/mapTag/registry/MapTagRegistryEntryHolder<TT;>" ],
-
-			"net/minecraft/entity/Entity": [ "org/solstice/euclidsElements/api/componentHolder/AdvancedComponentHolder" ]
-		}
-	},
-
 	"depends": {
 		"minecraft": "*",
 		"fabric-api": "*"

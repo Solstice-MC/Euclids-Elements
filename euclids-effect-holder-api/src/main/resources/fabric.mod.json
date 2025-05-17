@@ -1,0 +1,26 @@
+{
+    "schemaVersion": 1,
+    "id": "euclids-effect-holder-api",
+    "version": "${module_version}",
+
+    "name": "Euclid's Effect Holder API",
+    "authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [ "org.solstice.euclidsElements.effectHolder.EuclidsEffectHolderAPI" ]
+	},
+	"mixins": [
+		"euclids-effect-holder-api.mixins.json"
+	],
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/enchantment/Enchantment": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolder" ],
+			"net/minecraft/enchantment/Enchantment\u0024Definition": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolder\u0024Definition" ],
+			"net/minecraft/component/type/ItemEnchantmentsComponent": [ "org/solstice/euclidsElements/effectHolder/api/item/component/EffectHolderComponent<Lnet/minecraft/enchantment/Enchantment;>" ],
+			"net/minecraft/enchantment/EnchantmentHelper\u0024Consumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024Consumer" ],
+			"net/minecraft/enchantment/EnchantmentHelper\u0024ContextAwareConsumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024ContextAwareConsumer" ],
+			"net/minecraft/entity/LivingEntity": [ "org/solstice/euclidsElements/effectHolder/api/entity/EntityEffectHolderData" ]
+		}
+	},
+	"accessWidener": "euclids-effect-holder-api.accesswidener"
+}
