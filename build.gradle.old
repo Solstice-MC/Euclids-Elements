@@ -16,7 +16,30 @@ allprojects {
 
 	group = mod_group
 
+//	sourceSets {
+//		testmod {
+//			compileClasspath += main.compileClasspath
+//			runtimeClasspath += main.runtimeClasspath
+//			resources.srcDirs += [ 'src/testmod/generated' ]
+//		}
+//	}
+
 	loom {
+//		runs {
+//			client {
+//				source sourceSets.testmod
+//				name "Minecraft Client"
+//			}
+//			server {
+//				source sourceSets.testmod
+//				name "Minecraft Server"
+//			}
+//			datagen {
+//				source sourceSets.testmod
+//				name "Data Generation"
+//				ideConfigGenerated = true
+//			}
+//		}
 		mixin {
 			useLegacyMixinAp = true
 		}
@@ -24,6 +47,7 @@ allprojects {
 			enableDependencyInterfaceInjection = true
 		}
 		enableTransitiveAccessWideners = true
+//		createRemapConfigurations(sourceSets.testmod)
 	}
 
 	dependencies {
@@ -31,6 +55,7 @@ allprojects {
 		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
 		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+//		testmodImplementation sourceSets.main.output
 	}
 
 	java {
@@ -65,7 +90,7 @@ subprojects {
 				url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
 				credentials {
 					username = 'soumeh'
-					password = System.getenv('CLOUDSMITH_API_KEY')
+					password = System.env.CLOUDSMITH_API_KEY
 				}
 			}
 		}
@@ -76,6 +101,7 @@ dependencies {
 	afterEvaluate {
 		subprojects.each {
 			implementation project(path: ":${it.path}", configuration: "namedElements")
+//			testmodImplementation project(":${it.path}").sourceSets.testmod.output
 			include project(path: ":${it.path}", configuration: "namedElements")
 		}
 	}
@@ -84,7 +110,7 @@ dependencies {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifactId = 'euclids-elements'
+			artifactId 'euclids-elements'
 		}
 	}
 }

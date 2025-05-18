@@ -10,6 +10,7 @@
 	},
 	"client": [
 		"ItemModelsMixin",
-		"ModelLoaderMixin"
+		"ModelLoaderMixin",
+		"SoundLoaderMixin"
 	]
 }

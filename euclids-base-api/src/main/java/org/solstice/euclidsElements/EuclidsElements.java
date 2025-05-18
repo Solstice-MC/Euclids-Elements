@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.solstice.euclidsElements.registry.EuclidsComponentTypes;
 import org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects;
+import org.solstice.euclidsElements.util.TestCodec;
 
 public class EuclidsElements implements ModInitializer {
 
@@ -20,6 +21,8 @@ public class EuclidsElements implements ModInitializer {
 	public void onInitialize() {
 		EuclidsComponentTypes.init();
 		EuclidsEnchantmentEffects.init();
+
+		System.out.println(TestCodec.CODEC.decoder());
 	}
 
 }

@@ -86,9 +86,11 @@ public class AutoLanguageGenerator extends FabricLanguageProvider implements Aut
 				.filter(this::ownsEntry)
 				.forEach(entry -> this.generateEntryTranslation(entry, builder))
 			);
-//		lookup.streamAllRegistryKeys().forEach(key ->
-//			lookup.getWrapperOrThrow(key).streamTagKeys().forEach(tag -> this.generateTagTranslation(tag, builder))
-//		);
+//		lookup.streamAllRegistryKeys()
+//			.map(lookup::getWrapperOrThrow)
+//			.forEach(registry ->
+//				registry.streamTagKeys().forEach(tag -> this.generateTagTranslation(tag, builder))
+//			);
 	}
 
 	public void generateEntryTranslation(RegistryEntry<?> entry, TranslationBuilder builder) {

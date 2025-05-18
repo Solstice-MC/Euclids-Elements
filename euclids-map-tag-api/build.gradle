@@ -1,4 +1,7 @@
+moduleDependencies(project, [
+	'euclids-base-api'
+])
+
 loom {
 	accessWidenerPath = file("src/main/resources/euclids-map-tag-api.accesswidener")
 }
-
