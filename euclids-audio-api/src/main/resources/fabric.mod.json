@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-audio-api",
+	"version": "${module_version}",
+
+	"name": "Euclid's Audio API",
+	"authors": [ "Solstice" ],
+
+	"environment": "client",
+
+	"accessWidener": "euclids-audio-api.accesswidener",
+	"mixins": [ "euclids-audio-api.mixins.json" ]
+}

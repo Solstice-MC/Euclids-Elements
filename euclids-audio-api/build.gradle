@@ -5,3 +5,7 @@ repositories {
 dependencies {
 	include implementation('de.maxhenkel.opus4j:opus4j:2.0.2')
 }
+
+loom {
+	accessWidenerPath = file("src/main/resources/euclids-audio-api.accesswidener")
+}

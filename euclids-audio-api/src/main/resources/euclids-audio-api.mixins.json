@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.audio.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"SoundListMixin",
+		"SoundLoaderMixin",
+		"SoundMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

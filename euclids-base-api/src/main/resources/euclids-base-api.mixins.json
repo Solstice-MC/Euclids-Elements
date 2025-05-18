@@ -5,12 +5,11 @@
 	"mixins": [
 		"MinecraftServerMixin"
 	],
-	"injectors": {
-		"defaultRequire": 1
-	},
 	"client": [
 		"ItemModelsMixin",
-		"ModelLoaderMixin",
-		"SoundLoaderMixin"
-	]
+		"ModelLoaderMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
 }

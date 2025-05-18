@@ -1,0 +1,8 @@
+{
+	"block.sacred_heart.heartbeat": {
+		"sounds": [
+			"euclids_elements:block/sacred_heart/heartbeat.opus"
+		],
+		"subtitle": "subtitle.block.sacred_heart.heartbeat"
+	}
+}
