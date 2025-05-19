@@ -10,7 +10,7 @@ rootProject.name = "Euclid's Elements"
 
 include (
 	'euclids-base-api',
-	'euclids-audio-api',
+//	'euclids-audio-api',
 	'euclids-map-tag-api',
 	'euclids-effect-holder-api',
 	'euclids-component-holder-api',
