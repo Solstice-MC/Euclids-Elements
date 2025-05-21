@@ -9,7 +9,9 @@ import java.util.function.UnaryOperator;
 
 public interface AdvancedComponentHolder {
 
-	ComponentMapImpl getComponents();
+	default ComponentMapImpl getComponents() {
+		return null;
+	}
 
 	@Nullable
 	default <T> T get(ComponentType<? extends T> type) {

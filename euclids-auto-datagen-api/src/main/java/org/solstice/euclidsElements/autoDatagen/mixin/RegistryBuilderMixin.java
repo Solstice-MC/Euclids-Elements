@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(RegistryBuilder.class)
 public class RegistryBuilderMixin {
 
-	// Odd registry key error monkey patch
+	// Registry creation error monkey patch
 	@Redirect(
 		method = "createWrapperLookup(Lnet/minecraft/registry/DynamicRegistryManager;)Lnet/minecraft/registry/RegistryWrapper$WrapperLookup;",
 		at = @At(

@@ -6,7 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.registry.*;
-import net.minecraft.registry.tag.TagEntry;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
@@ -16,10 +16,10 @@ import org.solstice.euclidsElements.EuclidsElements;
 import java.io.Reader;
 import java.util.*;
 
-public class MapTagLoader implements SimpleSynchronousResourceReloadListener {
+public class MapTagLoader<T, R> implements SimpleSynchronousResourceReloadListener {
 
 	public static final Identifier ID = EuclidsElements.of("map_tags");
-	public static final String PATH = "data_maps";
+	public static final String PATH = "map_tags";
 
 	public static String getFolderLocation(Identifier id) {
 		String location = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) ? "" : id.getNamespace() + "/";
@@ -31,37 +31,43 @@ public class MapTagLoader implements SimpleSynchronousResourceReloadListener {
 		return ID;
 	}
 
-	public Map<RegistryKey<? extends Registry<?>>, LoadResult<?, ?>> results;
-//	public Map<RegistryKey<? extends Registry<?>>, LoadResult<?, ?>> results;
-//	public Map<RegistryKey<? extends Registry<?>>, Map<MapTagKey<?, ?>, List<MapTagFile<?>>>> results;
-
 	private final DynamicRegistryManager registryAccess;
 
 	public MapTagLoader(DynamicRegistryManager registryAccess) {
 		this.registryAccess = registryAccess;
 	}
 
-	public <T, R> void addResults(RegistryKey<? extends Registry<?>> registryKey, MapTagKey<?, ?> mapTagKey, LoadResult<?, ?> result) {
-//		this.results.computeIfAbsent(registryKey,
-//			k -> new LoadResult<>(new HashMap<>())
-//		).results.put(mapTagKey, result);
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public void reload(ResourceManager manager) {
 		RegistryOps<JsonElement> ops = RegistryOps.of(JsonOps.INSTANCE, this.registryAccess);
-//		this.registryAccess.streamAllRegistryKeys().forEach(key -> this.loadFromKey(manager, ops, key));
-//		this.results.forEach((key, results) -> this.apply(key, results));
+		Map<RegistryKey<Registry<T>>, Map<MapTagKey<T, R>, List<MapTagFileContent<R>>>> test = new HashMap<>();
+		this.registryAccess.streamAllRegistryKeys()
+			.map(key -> (RegistryKey<Registry<T>>) key)
+			.forEach(key -> test.put(key, test(manager, ops, key)));
+
+		test.forEach((registryReference, test2) -> {
+			Registry<T> registry = this.registryAccess.get(registryReference);
+			test2.forEach((mapTagKey, content) -> {
+				content.forEach(mapTagContent -> {
+					mapTagContent.entries().forEach((mapTagEntry, value) -> {
+						List<RegistryEntry<T>> entries = mapTagEntry.getEntries(registry);
+						entries.forEach(entry -> {
+							entry.addValue((MapTagKey<T, Object>) mapTagKey, value);
+							System.out.println(entry.getMapTags());
+						});
+					});
+				});
+			});
+		});
 	}
 
-//	@SuppressWarnings("unchecked")
-//	public <T> void apply(RegistryKey<? extends Registry<?>> key, Map<MapTagKey<?, ?>, List<MapTagFile<?>>> results) {
-//		Registry<T> registry = (Registry<T>) this.registryAccess.get(key);
-//		registry.getMapTags().put(key, buildDataMap(registry, key, results));
-//	}
-
-	@SuppressWarnings("unchecked")
-	public <T, R> void loadFromKey(ResourceManager manager, RegistryOps<JsonElement> ops, RegistryKey<Registry<T>> registryKey) {
+	public static <T, R> Map<MapTagKey<T, R>, List<MapTagFileContent<R>>> test(
+		ResourceManager manager,
+		RegistryOps<JsonElement> ops,
+		RegistryKey<Registry<T>> registryKey
+	) {
+		Map<MapTagKey<T, R>, List<MapTagFileContent<R>>> results = new HashMap<>();
 		ResourceFinder finder = ResourceFinder.json(PATH + "/" + getFolderLocation(registryKey.getValue()));
 
 		finder.findAllResources(manager).forEach((path, resources) -> {
@@ -69,32 +75,22 @@ public class MapTagLoader implements SimpleSynchronousResourceReloadListener {
 			MapTagKey<T, R> mapTagKey = MapTagManager.get(registryKey, id);
 			if (mapTagKey == null) return;
 
-			List<MapTagFile<R>> files = readData(ops, mapTagKey, resources);
-
-			Registry<T> registry = this.registryAccess.get(registryKey);
-
-//			registry.getMapTags().put(registryKey, buildDataMap(registry, mapTagKey, results));
-
-
-
-//			LoadResult<T, R> result = new LoadResult<>(mapTagKey, files);
-//			this.results.computeIfAbsent((RegistryKey<? extends Registry<?>>) registryKey,
-//				k -> new LoadResult<>(new HashMap<>())
-//			).results.put(mapTagKey, files);
-//			this.results.put((RegistryKey<? extends Registry<?>>) registryKey, result);
+			List<MapTagFileContent<R>> contents = readContents(ops, mapTagKey, resources);
+			results.put(mapTagKey, contents);
 		});
+		return results;
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <R> List<MapTagFile<R>> readData(RegistryOps<JsonElement> ops, MapTagKey<?, ?> mapTagKey, List<Resource> resources) {
-		List<MapTagFile<R>> result = new LinkedList<>();
+	public static <R> List<MapTagFileContent<R>> readContents(RegistryOps<JsonElement> ops, MapTagKey<?, ?> mapTagKey, List<Resource> resources) {
+		List<MapTagFileContent<R>> result = new LinkedList<>();
 		resources.forEach(resource -> {
 			try (Reader reader = resource.getReader()) {
 				JsonElement element = JsonParser.parseReader(reader);
-				Codec<MapTagFile<R>> codec = MapTagFile.codec((MapTagKey<?, R>) mapTagKey);
+				Codec<MapTagFileContent<R>> codec = MapTagFileContent.codec((MapTagKey<?, R>) mapTagKey);
 				result.add(codec.decode(ops, element).getOrThrow().getFirst());
 			} catch (Exception exception) {
-				EuclidsElements.LOGGER.error("Could not read tag key {}", mapTagKey.id(), exception);
+				EuclidsElements.LOGGER.error("Could not read tag key {}", mapTagKey.getId(), exception);
 			}
 		});
 		return result;
@@ -156,15 +152,17 @@ public class MapTagLoader implements SimpleSynchronousResourceReloadListener {
 //		return result;
 //	}
 
-	public static <R> List<RegistryKey<R>> keysFromEntry(Registry<R> registry, TagEntry entry) {
-		List<RegistryKey<R>> result = new ArrayList<>();
+//	public static <R> List<RegistryKey<R>> keysFromEntry(Registry<R> registry, TagEntry entry) {
+//		List<RegistryKey<R>> result = new ArrayList<>();
 //		if (entry.tag) {
 //			TagKey<R> key = TagKey.of(registry, entry.id);
 //			registry.iterateEntries()
 //		}
-		return result;
-	}
+//		return result;
+//	}
 
-	public record LoadResult<T, R>(Map<MapTagKey<T, R>, List<MapTagFile<R>>> results) {}
+//	public record LoadResult<T, R>(Map<MapTagKey<T, R>, List<MapTagContent<R>>> results) {}
+
+//	public record LoadResult<T, R>(Map<MapTagKey<T, R>, List<MapTagContent<R>>> results) {}
 
 }

@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public record MapTagFile<R> (
-	Map<TagEntry, R> entries,
-	List<TagEntry> removals
+public record MapTagFileContent<R> (
+	Map<MapTagEntry, R> entries,
+	List<MapTagEntry> removals
 ) {
 
 	public static final Codec<TagEntry> ENTRY_CODEC = Codecs.TAG_ENTRY_ID.xmap(id -> new TagEntry(id, true), tagEntry -> null);
 
-	public static <R> Codec<MapTagFile<R>> codec(MapTagKey<?, R> type) {
+	public static <R> Codec<MapTagFileContent<R>> codec(MapTagKey<?, R> type) {
 		return RecordCodecBuilder.create(instance -> instance.group(
-			Codec.unboundedMap(TagEntry.CODEC, type.codec()).fieldOf("entries").forGetter(MapTagFile::entries),
-			ENTRY_CODEC.listOf().optionalFieldOf("removals", new ArrayList<>()).forGetter(MapTagFile::removals)
-		).apply(instance, MapTagFile::new));
+			Codec.unboundedMap(MapTagEntry.CODEC, type.getCodec()).fieldOf("entries").forGetter(MapTagFileContent::entries),
+			MapTagEntry.CODEC.listOf().optionalFieldOf("removals", new ArrayList<>()).forGetter(MapTagFileContent::removals)
+		).apply(instance, MapTagFileContent::new));
 	}
 
 }

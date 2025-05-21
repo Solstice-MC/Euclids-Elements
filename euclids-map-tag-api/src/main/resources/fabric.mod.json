@@ -13,7 +13,6 @@
 	"accessWidener": "euclids-map-tag-api.accesswidener",
 	"custom": {
 		"loom:injected_interfaces": {
-			"net/minecraft/registry/Registry": [ "org/solstice/euclidsElements/mapTag/api/registry/MapTagRegistryHolder<TT;>" ],
 			"net/minecraft/registry/entry/RegistryEntry": [ "org/solstice/euclidsElements/mapTag/api/registry/MapTagRegistryEntryHolder<TT;>" ]
 		}
 	},

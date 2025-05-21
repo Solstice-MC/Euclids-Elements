@@ -1,20 +1,11 @@
 {
     "schemaVersion": 1,
-    "id": "euclids-effect-holder-api",
+    "id": "euclids-auto-datagen-api",
     "version": "${module_version}",
 
-    "name": "Euclid's Effect Holder API",
+    "name": "Euclid's Auto Datagen API",
     "authors": [ "Solstice" ],
 
-	"entrypoints": {
-		"main": [ "org.solstice.euclidsElements.effectHolder.EuclidsEffectHolderAPI" ]
-	},
-	"mixins": [
-		"euclids-auto-datagen-api.mixins.json"
-	],
-	"custom": {
-		"loom:injected_interfaces": {
-		}
-	},
-	"accessWidener": "euclids-auto-datagen-api.accesswidener"
+	"accessWidener": "euclids-auto-datagen-api.accesswidener",
+	"mixins": [ "euclids-auto-datagen-api.mixins.json" ]
 }

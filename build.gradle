@@ -16,14 +16,38 @@ allprojects {
 
 	group = mod_group
 
+//	sourceSets {
+//		testmod {
+//			compileClasspath += main.compileClasspath
+//			runtimeClasspath += main.runtimeClasspath
+//			resources.srcDirs += [ 'src/testmod/generated' ]
+//		}
+//	}
+
 	loom {
-		mixin {
-			useLegacyMixinAp = true
-		}
-		interfaceInjection {
-			enableDependencyInterfaceInjection = true
-		}
-		enableTransitiveAccessWideners = true
+//		runs {
+//			client {
+//				source sourceSets.testmod
+//				name "Minecraft Client"
+//			}
+//			server {
+//				source sourceSets.testmod
+//				name "Minecraft Server"
+//			}
+//			datagen {
+//				source sourceSets.testmod
+//				name "Data Generation"
+//				ideConfigGenerated = true
+//			}
+//		}
+//		mixin {
+//			useLegacyMixinAp = true
+//		}
+//		interfaceInjection {
+//			enableDependencyInterfaceInjection = true
+//		}
+//		enableTransitiveAccessWideners = true
+//		createRemapConfigurations(sourceSets.testmod)
 	}
 
 	dependencies {
@@ -31,6 +55,7 @@ allprojects {
 		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
 		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+//		testmodImplementation sourceSets.main.output
 	}
 
 	java {
@@ -72,11 +97,19 @@ subprojects {
 	}
 }
 
+remapJar {
+	afterEvaluate {
+		subprojects.each {
+			nestedJars.from project(":${it.path}").tasks.getByName("remapJar")
+		}
+	}
+}
+
 dependencies {
 	afterEvaluate {
 		subprojects.each {
 			implementation project(path: ":${it.path}", configuration: "namedElements")
-			include project(path: ":${it.path}", configuration: "namedElements")
+//			testmodImplementation project(":${it.path}").sourceSets.testmod.output
 		}
 	}
 }

@@ -6,11 +6,33 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public record MapTagKey<T, R> (
-	RegistryKey<Registry<T>> registry,
-	Codec<R> codec,
-	Identifier id
-) {
+public class MapTagKey<T, R> {
+
+	private final RegistryKey<Registry<T>> registry;
+	private final Codec<R> codec;
+	private final Identifier id;
+
+	public RegistryKey<Registry<T>> getRegistry() {
+		return registry;
+	}
+
+	public Codec<R> getCodec() {
+		return codec;
+	}
+
+	public Identifier getId() {
+		return id;
+	}
+
+	protected MapTagKey (
+		RegistryKey<Registry<T>> registry,
+		Codec<R> codec,
+		Identifier id
+	) {
+		this.registry = registry;
+		this.codec = codec;
+		this.id = id;
+	}
 
 	public static <T, R> MapTagKey<T, R> of(RegistryKey<Registry<T>> registry, Codec<R> codec, Identifier id) {
 		MapTagKey<T, R> key = new MapTagKey<>(registry, codec, id);
@@ -28,16 +50,20 @@ public record MapTagKey<T, R> (
 	}
 
 	public String getTranslationKey() {
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("map_tag.");
-		Identifier registryId = this.registry().getValue();
-		Identifier tagId = this.id();
-		if (!registryId.getNamespace().equals("minecraft")) {
-			stringBuilder.append(registryId.getNamespace()).append(".");
-		}
+		StringBuilder builder = new StringBuilder("map_tag.");
+//		builder.append("map_tag.");
 
-		stringBuilder.append(registryId.getPath().replace("/", ".")).append(".").append(tagId.getNamespace()).append(".").append(tagId.getPath().replace("/", ".").replace(":", "."));
-		return stringBuilder.toString();
+		Identifier registryId = this.registry.getValue();
+		if (!registryId.getNamespace().equals("minecraft"))
+			builder.append(registryId.getNamespace()).append(".");
+
+		return builder
+			.append(registryId.getPath().replace("/", "."))
+			.append(".")
+			.append(this.id.getNamespace())
+			.append(".")
+			.append(this.id.getPath().replace("/", ".").replace(":", "."))
+			.toString();
 	}
 
 	public Text getName() {

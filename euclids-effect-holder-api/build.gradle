@@ -1,3 +1,5 @@
+apply plugin: 'fabric-loom'
+
 moduleDependencies(project, [
 	'euclids-base-api'
 ])

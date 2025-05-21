@@ -4,7 +4,7 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"RegistryEntryMixin",
-		"SimpleRegistryMixin"
+		"RegistryEntryReferenceMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
