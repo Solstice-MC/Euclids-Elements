@@ -43,7 +43,6 @@ public class OpusAudioStream implements BufferedAudioStream {
 
     @Override
     public boolean read(FloatConsumer consumer) throws IOException {
-		System.out.println("o");
         if (this.endOfStream) return false;
 
         // Read data from the input stream

@@ -1,0 +1,19 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.enchantmentTooltips.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ItemEnchantmentsComponentMixin",
+		"enchantmentEffect.EnchantmentEffectEntryMixin",
+		"enchantmentEffect.TargetedEnchantmentEffectMixin",
+		"enchantmentEffect.entity.ApplyMobEffectEnchantmentEffectMixin",
+		"enchantmentEffect.entity.EnchantmentEntityEffectMixin",
+		"enchantmentEffect.value.EnchantmentValueEffectMixin",
+		"enchantmentEffect.value.EnchantmentValueEffectsMixin",
+		"lootCondition.AllOfLootConditionMixin",
+		"lootCondition.EntityPropertiesLootConditionMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

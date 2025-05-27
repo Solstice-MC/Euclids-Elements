@@ -17,8 +17,6 @@ public class EuclidsMapTagAPI implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		System.out.println("AAAAAAAAAAAAAAAAAAAAA");
-		System.out.println(TEST);
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(MapTagLoader.ID, registries ->
 			new MapTagLoader<>(((DataPackContents.ConfigurableWrapperLookup)registries).dynamicRegistryManager)
 		);

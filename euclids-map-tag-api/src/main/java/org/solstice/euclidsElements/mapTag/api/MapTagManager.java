@@ -19,7 +19,6 @@ public class MapTagManager {
 	public static <T, R> void add(MapTagKey<T, R> type) {
 		Map<Identifier, MapTagKey<?, ?>> map = getOrCreate(type.getRegistry());
 		map.put(type.getId(), type);
-		System.out.println(DATA_MAPS);
 	}
 
 	@SuppressWarnings("unchecked")

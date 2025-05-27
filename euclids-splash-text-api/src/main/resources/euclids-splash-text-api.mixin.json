@@ -1,0 +1,9 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "org.solstice.euclidsElements.splashText.mixin",
+	"client": [
+		"MinecraftClientMixin"
+	],
+	"compatibilityLevel": "JAVA_17"
+}

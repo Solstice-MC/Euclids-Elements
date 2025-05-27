@@ -1,6 +1,7 @@
 package org.solstice.euclidsElements;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,10 @@ public class EuclidsElements implements ModInitializer {
     public static Identifier of(String path) {
         return Identifier.of(MOD_ID, path);
     }
+
+	public static boolean isModLoaded(String mod) {
+		return FabricLoader.getInstance().isModLoaded(mod);
+	}
 
 	@Override
 	public void onInitialize() {

@@ -13,7 +13,7 @@ public class EnchantmentMixin implements EffectHolder {
     @Shadow @Final private ComponentMap effects;
     @Shadow @Final private Enchantment.Definition definition;
 
-    @Override
+	@Override
     public ComponentMap getEffects() {
         return this.effects;
     }

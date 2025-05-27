@@ -1,0 +1,26 @@
+{
+    "schemaVersion": 1,
+    "id": "euclids-enchantment-tooltips",
+    "version": "${module_version}",
+
+    "name": "Euclid's Enchantment Tooltips",
+    "authors": [ "Solstice" ],
+
+	"accessWidener": "euclids-enchantment-tooltips.accesswidener",
+	"mixins": [ "euclids-enchantment-tooltips.mixin.json" ],
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/loot/condition/LootCondition": [ "org/solstice/euclidsElements/enchantmentTooltips/api/EuclidsLootCondition" ],
+
+
+
+
+
+			"net/minecraft/enchantment/effect/EnchantmentLocationBasedEffect": [ "org/solstice/euclidsElements/enchantmentTooltips/api/wip/TooltipEnchantmentLocationBasedEffect" ],
+			"net/minecraft/enchantment/effect/EnchantmentEntityEffect": [ "org/solstice/euclidsElements/enchantmentTooltips/api/wip/TooltipEnchantmentEntityEffect" ],
+
+			"net/minecraft/enchantment/effect/EnchantmentEffectEntry": [ "org/solstice/euclidsElements/enchantmentTooltips/api/EuclidsEnchantmentEffect" ],
+			"net/minecraft/enchantment/effect/TargetedEnchantmentEffect": [ "org/solstice/euclidsElements/enchantmentTooltips/api/EuclidsEnchantmentEffect" ]
+		}
+	}
+}

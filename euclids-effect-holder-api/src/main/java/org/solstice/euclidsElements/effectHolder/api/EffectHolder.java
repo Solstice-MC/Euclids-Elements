@@ -25,16 +25,30 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+
+/**
+ * An object that can hold and apply {@link EnchantmentValueEffect}s
+ */
 public interface EffectHolder {
 
+    /**
+     * Gets the component map containing all effects associated with this holder.
+     *
+     * @return The component map of effects
+     */
     ComponentMap getEffects();
 
+    /**
+     * Gets the definition of this effect holder, which includes information about
+     * max level and applicable equipment slots.
+     *
+     * @return The definition of this effect holder
+     */
     Definition getDefinition();
 
     default boolean slotMatches(EquipmentSlot equipmentSlot) {
         return this.getDefinition().getSlots().stream().anyMatch(slot -> slot.matches(equipmentSlot));
     }
-
 
     static <T> void applyEffects(List<EnchantmentEffectEntry<T>> entries, LootContext context, Consumer<T> effectConsumer) {
         entries.forEach(effect -> {
@@ -47,7 +61,6 @@ public interface EffectHolder {
     default <T> List<T> getEffect(ComponentType<List<T>> type) {
         return this.getEffects().getOrDefault(type, List.of());
     }
-
 
     default void onTick(ServerWorld world, int level, EnchantmentEffectContext context, Entity user) {
         applyEffects(
@@ -202,7 +215,6 @@ public interface EffectHolder {
 		this.modifyValue(EuclidsEnchantmentEffects.MAX_DURABILITY, Random.create(), level, maxDurability);
 	}
 
-
     default void applyLocationBasedEffects(ServerWorld world, int level, EnchantmentEffectContext context, LivingEntity user) {
 		Set<EnchantmentLocationBasedEffect> locationEffects = user.getLocationBasedEffects().remove(this);
         if (context.slot() != null && !this.slotMatches(context.slot())) {
@@ -242,8 +254,22 @@ public interface EffectHolder {
     }
 
 
+    /**
+     * Defines the common properties of an effect holder
+     */
     interface Definition {
+        /**
+         * Gets the maximum level this effect holder can have.
+         *
+         * @return The maximum level
+         */
         int getMaxLevel();
+
+        /**
+         * Gets the list of equipment slots this effect holder can be applied to.
+         *
+         * @return The list of applicable equipment slots
+         */
         List<AttributeModifierSlot> getSlots();
     }
 

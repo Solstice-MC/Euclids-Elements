@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-splash-text-api",
+	"version": "${module_version}",
+
+	"name": "Euclid's Splash Text API",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"client": [ "org.solstice.euclidsElements.splashText.EuclidsSplashTextAPI" ]
+	},
+	"mixins": [ "euclids-splash-text-api.mixin.json" ]
+}

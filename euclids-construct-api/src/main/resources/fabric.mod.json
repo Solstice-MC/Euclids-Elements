@@ -1,0 +1,13 @@
+{
+    "schemaVersion": 1,
+    "id": "euclids-construct-api",
+    "version": "${module_version}",
+
+    "name": "Euclid's Construct API",
+    "authors": [ "Solstice" ],
+
+    "entrypoints": {
+		"main": [ "org.solstice.euclidsElements.construct.EuclidsConstructAPI" ]
+	},
+    "mixins": [ "euclids-construct-api.mixins.json" ]
+}

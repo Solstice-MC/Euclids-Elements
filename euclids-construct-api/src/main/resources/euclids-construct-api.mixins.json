@@ -1,0 +1,16 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.construct.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"BlockFixMixins$CarvedPumpkinBlockMixin",
+		"BlockFixMixins$WitherSkullBlockMixin",
+		"BlockItemMixin",
+		"CarvedPumpkinBlockInvoker",
+		"EntityConstructionFixMixins$IronGolemMixin",
+		"EntityConstructionFixMixins$WitherEntityMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

@@ -1,0 +1,23 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.recipeBook.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"RecipeBookMixin",
+		"RecipeBookOptionsMixin",
+		"RecipeCategoryOptionsC2SPacketMixin",
+		"screen.AbstractFurnaceScreenHandler",
+		"screen.AbstractRecipeScreenHandlerMixin",
+		"screen.BlastFurnaceScreenHandlerMixin",
+		"screen.CraftingScreenHandlerMixin",
+		"screen.FurnaceScreenHandler",
+		"screen.PlayerScreenHandlerMixin",
+		"screen.SmokerScreenHandler"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"client": [
+		"RecipeBookWidgetMixin"
+	]
+}
