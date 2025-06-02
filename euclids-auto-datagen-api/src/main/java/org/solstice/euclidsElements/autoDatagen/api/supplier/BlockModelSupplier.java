@@ -1,6 +1,7 @@
 package org.solstice.euclidsElements.autoDatagen.api.supplier;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.data.client.*;
@@ -8,6 +9,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class BlockModelSupplier extends ModelSupplier<Block, BlockStateModelGenerator, BlockModelSupplier.ModelProvider> {
 
@@ -26,6 +28,19 @@ public class BlockModelSupplier extends ModelSupplier<Block, BlockStateModelGene
 				break;
 			}
 		}
+	}
+
+	public static Model templatedModel(Identifier id, Optional<String> variant, TextureKey... keys) {
+		id = id.withPrefixedPath("block/template/");
+		return new Model(Optional.of(id), variant, keys);
+	}
+
+	public static Model templatedModel(Identifier id, Optional<String> variant) {
+		return templatedModel(id, variant, TextureKey.TEXTURE);
+	}
+
+	public static Model templatedModel(Identifier id) {
+		return templatedModel(id, Optional.empty(), TextureKey.TEXTURE);
 	}
 
 	public interface ModelProvider extends ModelSupplier.ModelProvider<Block, BlockStateModelGenerator> {}
@@ -59,6 +74,16 @@ public class BlockModelSupplier extends ModelSupplier<Block, BlockStateModelGene
 		}));
 		generator.blockStateCollector.accept(supplier);
 		generator.registerParentedItemModel(block, blockId.withSuffixedPath("/height/2"));
+	}
+
+	public static void registerCooker(BlockStateModelGenerator generator, Block block, Identifier id) {
+		generator.registerCooker(block, TexturedModel.ORIENTABLE);
+		generator.registerParentedItemModel(block, id);
+	}
+
+	public static void registerCubeTop(BlockStateModelGenerator generator, Block block, Identifier id) {
+		generator.registerSingleton(block, TexturedModel.CUBE_TOP);
+		generator.registerParentedItemModel(block, id);
 	}
 
 }
