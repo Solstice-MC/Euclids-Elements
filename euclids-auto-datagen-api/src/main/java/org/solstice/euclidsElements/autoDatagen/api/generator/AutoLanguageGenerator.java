@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class AutoLanguageGenerator extends FabricLanguageProvider implements AutoGenerator {
 
 	public static final List<RegistryKey<?>> REGISTRY_BLACKLIST = List.of(
+		RegistryKeys.SOUND_EVENT,
 		RegistryKeys.RECIPE_SERIALIZER,
 		RegistryKeys.BIOME
 	);
@@ -71,7 +72,10 @@ public class AutoLanguageGenerator extends FabricLanguageProvider implements Aut
 	}
 
 	protected Path getLangFilePath() {
-		return this.dataOutput.getResolver(DataOutput.OutputType.RESOURCE_PACK, "lang").resolveJson(Identifier.of(this.dataOutput.getModId() + "-datagen", "en_us"));
+		String modId = this.dataOutput.getModId();
+		if (!modId.endsWith("datagen")) modId += "-datagen";
+		Identifier path = Identifier.of(modId, "en_us");
+		return this.dataOutput.getResolver(DataOutput.OutputType.RESOURCE_PACK, "lang").resolveJson(path);
 	}
 
 	@Override
