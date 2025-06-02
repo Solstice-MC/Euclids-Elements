@@ -7,5 +7,9 @@
     "authors": [ "Solstice" ],
 
 	"accessWidener": "euclids-auto-datagen-api.accesswidener",
-	"mixins": [ "euclids-auto-datagen-api.mixins.json" ]
+	"mixins": [ "euclids-auto-datagen-api.mixins.json" ],
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
 }

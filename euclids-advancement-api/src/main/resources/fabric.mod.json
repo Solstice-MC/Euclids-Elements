@@ -6,9 +6,7 @@
     "name": "Euclid's Advancement API",
     "authors": [ "Solstice" ],
 
-	"mixins": [
-		"euclids-advancement-api.mixins.json"
-	],
+	"mixins": ["euclids-advancement-api.mixins.json"],
 	"custom": {
 		"loom:injected_interfaces": {
 			"net/minecraft/advancement/Advancement\u0024Builder": [ "org/solstice/euclidsElements/advancement/api/EuclidsAdvancementBuilder" ]

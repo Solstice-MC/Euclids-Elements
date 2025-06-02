@@ -9,6 +9,42 @@ apply from: rootProject.file('common.gradle')
 base.archivesName = mod_id
 version = mod_version
 
+sourceSets {
+	testmod {
+		compileClasspath += main.compileClasspath
+		runtimeClasspath += main.runtimeClasspath
+		resources.srcDirs += [ 'src/testmod/generated' ]
+	}
+}
+
+loom {
+	runs {
+		client {
+			inherit client
+			source sourceSets.testmod
+			name "Minecraft Client"
+		}
+		server {
+			inherit server
+			source sourceSets.testmod
+			name "Minecraft Server"
+		}
+	}
+	interfaceInjection {
+		enableDependencyInterfaceInjection = true
+	}
+	createRemapConfigurations(sourceSets.testmod)
+}
+
+fabricApi {
+	configureDataGeneration {
+		outputDirectory = file("src/testmod/generated")
+		createSourceSet = false
+		addToResources = false
+		strictValidation = true
+	}
+}
+
 allprojects {
 	apply plugin: 'java'
 	apply plugin: 'maven-publish'
@@ -16,46 +52,11 @@ allprojects {
 
 	group = mod_group
 
-//	sourceSets {
-//		testmod {
-//			compileClasspath += main.compileClasspath
-//			runtimeClasspath += main.runtimeClasspath
-//			resources.srcDirs += [ 'src/testmod/generated' ]
-//		}
-//	}
-
-	loom {
-//		runs {
-//			client {
-//				source sourceSets.testmod
-//				name "Minecraft Client"
-//			}
-//			server {
-//				source sourceSets.testmod
-//				name "Minecraft Server"
-//			}
-//			datagen {
-//				source sourceSets.testmod
-//				name "Data Generation"
-//				ideConfigGenerated = true
-//			}
-//		}
-//		mixin {
-//			useLegacyMixinAp = true
-//		}
-//		interfaceInjection {
-//			enableDependencyInterfaceInjection = true
-//		}
-//		enableTransitiveAccessWideners = true
-//		createRemapConfigurations(sourceSets.testmod)
-	}
-
 	dependencies {
 		minecraft "com.mojang:minecraft:${minecraft_version}"
 		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
 		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-//		testmodImplementation sourceSets.main.output
 	}
 
 	java {
@@ -89,12 +90,16 @@ subprojects {
 				name = "cloudsmith"
 				url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
 				credentials {
-					username = 'soumeh'
+					username = System.getenv('CLOUDSMITH_USERNAME')
 					password = System.getenv('CLOUDSMITH_API_KEY')
 				}
 			}
 		}
 	}
+}
+
+subprojects.each {
+	remapJar.dependsOn("${it.path}:remapJar")
 }
 
 remapJar {
@@ -106,10 +111,11 @@ remapJar {
 }
 
 dependencies {
+	testmodImplementation sourceSets.main.output
 	afterEvaluate {
 		subprojects.each {
 			implementation project(path: ":${it.path}", configuration: "namedElements")
-//			testmodImplementation project(":${it.path}").sourceSets.testmod.output
+			testmodImplementation project(path: ":${it.path}", configuration: "namedElements")
 		}
 	}
 }

@@ -1,0 +1,8 @@
+{
+	"values": [
+		"minecraft:recipe_serializer",
+		"minecraft:worldgen/biome",
+		"minecraft:data_component_type",
+		"minecraft:item"
+	]
+}

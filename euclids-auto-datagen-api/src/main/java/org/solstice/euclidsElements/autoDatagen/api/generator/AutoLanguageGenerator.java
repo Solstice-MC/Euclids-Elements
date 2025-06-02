@@ -6,12 +6,11 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.data.DataOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.DataWriter;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Language;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -101,6 +100,8 @@ public class AutoLanguageGenerator extends FabricLanguageProvider implements Aut
 		String dataType = registryKey.getRegistry().getPath();
 		if (dataType.endsWith("_type")) dataType = dataType.split("_type")[0];
 		String key = id.toTranslationKey(dataType);
+		if (Language.getInstance().hasTranslation(key)) return;
+
 		String translation = translationFromIdentifier(id);
 		builder.add(key, translation);
 	}
@@ -108,6 +109,8 @@ public class AutoLanguageGenerator extends FabricLanguageProvider implements Aut
 	public void generateTagTranslation(TagKey<?> tag, TranslationBuilder builder) {
 		Identifier id = tag.id();
 		String key = id.toTranslationKey("tag." + tag.registry().getValue().getPath());
+		if (Language.getInstance().hasTranslation(key)) return;
+
 		String translation = translationFromIdentifier(id);
 		builder.add(key, translation);
 	}

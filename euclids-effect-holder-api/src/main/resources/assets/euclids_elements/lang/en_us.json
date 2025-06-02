@@ -1,6 +1,0 @@
-{
-	"enchantment_effect.minecraft.damage": "%s Damage",
-	"enchantment_effect.minecraft.post_attack": "After Attack: %s",
-
-	"loot_condition.minecraft.entity_properties": "To %s"
-}

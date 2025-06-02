@@ -20,5 +20,9 @@
 			"net/minecraft/enchantment/EnchantmentHelper\u0024ContextAwareConsumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024ContextAwareConsumer" ],
 			"net/minecraft/entity/LivingEntity": [ "org/solstice/euclidsElements/effectHolder/api/entity/EntityEffectHolderData" ]
 		}
+	},
+
+	"depends": {
+		"euclids-base-api": "*"
 	}
 }

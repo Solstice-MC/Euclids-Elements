@@ -4,6 +4,12 @@
 
 **Euclid's Elements** is a library mod for creating customizable content mods.
 
+> [!CAUTION]
+> The API is not yet stable and may change significantly between versions.
+    There may be game breaking bugs that cannot be undone and may destroy worlds.
+    Documentation may be missing for some parts, especially those that are still under active development.
+
+
 # Usage
 
 Add the Solstice Maven to your build file.

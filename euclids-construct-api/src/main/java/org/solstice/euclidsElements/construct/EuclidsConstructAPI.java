@@ -27,14 +27,12 @@ public class EuclidsConstructAPI implements ModInitializer {
 		EuclidsElements.of("construct_blocks")
 	);
 
-
 	@Override
 	public void onInitialize() {
 		DynamicRegistries.registerSynced(REGISTRY_KEY, Construct.CODEC);
 		DispenserBlock.registerBehavior(Blocks.CARVED_PUMPKIN, new ConstructBlockPlacementDispenserBehavior());
 		DispenserBlock.registerBehavior(Blocks.WITHER_SKELETON_SKULL, new ConstructBlockPlacementDispenserBehavior());
 	}
-
 
 	public static boolean isConstructBlock(BlockState state) {
 		return state.isIn(CONSTRUCT_BLOCK);

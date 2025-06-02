@@ -19,7 +19,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.solstice.euclidsElements.registry.EuclidsEnchantmentEffects;
+import org.solstice.euclidsElements.effectHolder.registry.EuclidsEnchantmentEffects;
 
 import java.util.List;
 import java.util.Set;

@@ -6,12 +6,5 @@
 	"name": "Euclid's Base API",
 	"authors": [ "Solstice" ],
 
-	"entrypoints": {
-		"main": [ "org.solstice.euclidsElements.EuclidsElements" ]
-	},
-	"mixins": [ "euclids-base-api.mixins.json" ],
-
-	"depends": {
-		"euclids-base-api": "*"
-	}
+	"mixins": [ "euclids-base-api.mixins.json" ]
 }

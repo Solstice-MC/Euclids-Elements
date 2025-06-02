@@ -9,5 +9,9 @@
     "entrypoints": {
 		"main": [ "org.solstice.euclidsElements.construct.EuclidsConstructAPI" ]
 	},
-    "mixins": [ "euclids-construct-api.mixins.json" ]
+    "mixins": [ "euclids-construct-api.mixins.json" ],
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
 }

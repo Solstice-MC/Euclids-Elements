@@ -9,5 +9,9 @@
 	"entrypoints": {
 		"client": [ "org.solstice.euclidsElements.splashText.EuclidsSplashTextAPI" ]
 	},
-	"mixins": [ "euclids-splash-text-api.mixin.json" ]
+	"mixins": [ "euclids-splash-text-api.mixin.json" ],
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
 }

@@ -1,14 +1,9 @@
 {
 	"required": true,
-	"package": "org.solstice.euclidsElements.mixin",
+	"package": "org.solstice.euclidsElements.content.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"MinecraftServerMixin"
-	],
-	"client": [
-		"ItemModelsMixin",
-		"ItemRendererMixin",
-		"ModelLoaderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
