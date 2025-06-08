@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "euclids-base-api",
-	"version": "${module_version}",
+	"version": "${mod_version}",
 
 	"name": "Euclid's Base API",
 	"authors": [ "Solstice" ],

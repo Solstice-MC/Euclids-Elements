@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "euclids-effect-holder-api",
-    "version": "${module_version}",
+    "version": "${mod_version}",
 
     "name": "Euclid's Effect Holder API",
     "authors": [ "Solstice" ],

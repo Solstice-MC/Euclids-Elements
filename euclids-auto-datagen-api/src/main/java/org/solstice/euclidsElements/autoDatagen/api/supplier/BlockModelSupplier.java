@@ -1,7 +1,6 @@
 package org.solstice.euclidsElements.autoDatagen.api.supplier;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.PillarBlock;
 import net.minecraft.block.SnowBlock;
 import net.minecraft.data.client.*;
@@ -47,6 +46,7 @@ public class BlockModelSupplier extends ModelSupplier<Block, BlockStateModelGene
 
 	static {
 		register(Block.class, BlockModelSupplier::registerBlock);
+
 		register(PillarBlock.class, BlockModelSupplier::registerPillar);
 		register(SnowBlock.class, BlockModelSupplier::registerLayered);
 	}

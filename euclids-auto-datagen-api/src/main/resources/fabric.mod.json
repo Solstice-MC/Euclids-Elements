@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "euclids-auto-datagen-api",
-    "version": "${module_version}",
+    "version": "${mod_version}",
 
     "name": "Euclid's Auto Datagen API",
     "authors": [ "Solstice" ],

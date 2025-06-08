@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "euclids-recipe-book-api",
-	"version": "${module_version}",
+	"version": "${mod_version}",
 
 	"name": "Euclid's Recipe Book API",
 	"authors": [ "Solstice" ],

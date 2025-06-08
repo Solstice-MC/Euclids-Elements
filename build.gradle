@@ -4,10 +4,8 @@ plugins {
 	id 'maven-publish'
 }
 
-apply from: rootProject.file('common.gradle')
-
-base.archivesName = mod_id
-version = mod_version
+apply from: "common.gradle"
+apply from: "functions.gradle"
 
 sourceSets {
 	testmod {
@@ -30,10 +28,7 @@ loom {
 			name "Minecraft Server"
 		}
 	}
-	interfaceInjection {
-		enableDependencyInterfaceInjection = true
-	}
-	createRemapConfigurations(sourceSets.testmod)
+	enableTransitiveAccessWideners = true
 }
 
 fabricApi {
@@ -45,78 +40,12 @@ fabricApi {
 	}
 }
 
-allprojects {
-	apply plugin: 'java'
-	apply plugin: 'maven-publish'
-	apply plugin: 'fabric-loom'
-
-	group = mod_group
-
-	dependencies {
-		minecraft "com.mojang:minecraft:${minecraft_version}"
-		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
-		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
-		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-	}
-
-	java {
-		withSourcesJar()
-	}
-
-	tasks.withType(ProcessResources).configureEach {
-		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-		filesMatching("fabric.mod.json") {
-			expand project.properties
-		}
-	}
-
-	publishing {
-		publications {
-			mavenJava(MavenPublication) {
-				from components.java
-			}
-		}
-	}
-	tasks.build.finalizedBy publishToMavenLocal
-}
-
-subprojects {
-	base.archivesName = project.name
-	version = module_version
-
-	publishing {
-		repositories {
-			maven {
-				name = "cloudsmith"
-				url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
-				credentials {
-					username = System.getenv('CLOUDSMITH_USERNAME')
-					password = System.getenv('CLOUDSMITH_API_KEY')
-				}
-			}
-		}
-	}
-}
-
-subprojects.each {
-	remapJar.dependsOn("${it.path}:remapJar")
-}
-
-remapJar {
-	afterEvaluate {
-		subprojects.each {
-			nestedJars.from project(":${it.path}").tasks.getByName("remapJar")
-		}
-	}
-}
-
 dependencies {
-	testmodImplementation sourceSets.main.output
-	afterEvaluate {
-		subprojects.each {
-			implementation project(path: ":${it.path}", configuration: "namedElements")
-			testmodImplementation project(path: ":${it.path}", configuration: "namedElements")
-		}
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+	subprojects.each {
+		api project(path: "${it.path}", configuration: "namedElements")
+		include project("${it.path}")
 	}
 }
 

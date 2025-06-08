@@ -19,8 +19,7 @@
 		"customItemModel.ItemRendererMixin",
 		"customItemModel.ModelLoaderMixin",
 		"itemCollapse.DrawContextMixin",
-		"posableItem.BipedEntityModelMixin",
-		"test.ChatInputSuggestorMixin"
+		"posableItem.BipedEntityModelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -1,0 +1,13 @@
+import org.codehaus.groovy.runtime.MethodClosure
+
+def moduleDependencies(Project module, List<String> dependencies) {
+	module.dependencies {
+		dependencies.each {
+			api project(path: ":$it", configuration: 'namedElements')
+		}
+	}
+}
+
+ext {
+	moduleDependencies = this.&moduleDependencies as MethodClosure
+}

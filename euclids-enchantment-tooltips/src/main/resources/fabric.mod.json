@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "euclids-enchantment-tooltips",
-    "version": "${module_version}",
+    "version": "${mod_version}",
 
     "name": "Euclid's Enchantment Tooltips",
     "authors": [ "Solstice" ],
