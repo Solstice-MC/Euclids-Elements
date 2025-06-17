@@ -1,0 +1,13 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.tag.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"RegistryEntryMixin",
+		"RegistryEntryReferenceMixin",
+		"TagGroupLoaderMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

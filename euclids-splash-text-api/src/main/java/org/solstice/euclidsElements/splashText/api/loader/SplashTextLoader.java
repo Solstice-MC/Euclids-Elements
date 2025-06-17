@@ -1,12 +1,11 @@
 package org.solstice.euclidsElements.splashText.api.loader;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.solstice.euclidsElements.splashText.api.manager.SplashTextManager;
 import org.solstice.euclidsElements.splashText.api.type.SimpleSplashText;
 import org.solstice.euclidsElements.splashText.api.type.SplashText;
-import org.solstice.euclidsElements.splashText.api.type.SplashTextData;
+import org.solstice.euclidsElements.splashText.api.type.SplashTextFile;
 import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -66,7 +65,7 @@ public class SplashTextLoader implements SimpleResourceReloadListener<Void> {
             EuclidsElements.LOGGER.error("Unable to load splash file: '{}', file must be an object containing splash value data", identifier);
             return;
         }
-        SplashTextData.fromJson(element.getAsJsonObject()).getTexts()
+        SplashTextFile.fromJson(element.getAsJsonObject()).getTexts()
             .filter(SplashText::validate)
             .forEach(SplashTextManager.INSTANCE::addSplashText);
     }

@@ -9,6 +9,9 @@ import java.util.function.UnaryOperator;
 
 public interface AdvancedComponentHolder {
 
+	default void setComponents(ComponentMapImpl components) {
+	}
+
 	default ComponentMapImpl getComponents() {
 		return null;
 	}

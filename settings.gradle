@@ -12,7 +12,7 @@ include (
 	'euclids-base-api',
 	'euclids-content',
 
-	'euclids-map-tag-api',
+	'euclids-tag-api',
 	'euclids-effect-holder-api',
 	'euclids-component-holder-api',
 	'euclids-advancement-api',

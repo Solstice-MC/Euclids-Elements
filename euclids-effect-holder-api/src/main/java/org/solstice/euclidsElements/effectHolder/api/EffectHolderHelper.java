@@ -1,7 +1,10 @@
 package org.solstice.euclidsElements.effectHolder.api;
 
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -14,12 +17,13 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.effectHolder.api.component.EffectHolderComponent;
+import org.solstice.euclidsElements.effectHolder.mixin.EnchantmentHelperMixin;
 import org.solstice.euclidsElements.util.RegistryHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EffectHolderHelper {
+public abstract class EffectHolderHelper {
 
     public static final List<ComponentType<? extends EffectHolderComponent<?>>> EFFECT_HOLDER_COMPONENTS = new ArrayList<>();
 
@@ -41,31 +45,36 @@ public class EffectHolderHelper {
 		});
 	}
 
-	public static void forEachEffectHolder(ItemStack stack, Consumer consumer) {
-        EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
-            EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
-            if (component == null) return;
-            component.getEffects().forEach(consumer::accept);
-        });
+	@SuppressWarnings("unchecked")
+	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, Consumer<T> consumer) {
+		EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
+			EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
+			if (component == null) return;
+
+			component.getEffects().forEach((entry, level) -> {
+				consumer.accept((RegistryEntry<T>) entry, level);
+			});
+		});
     }
 
-    public static void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, LivingEntity entity, ContextAwareConsumer contextAwareConsumer) {
-        if (stack.isEmpty()) return;
+	@SuppressWarnings("unchecked")
+	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, LivingEntity entity, ContextAwareConsumer<T> consumer) {
+		if (stack.isEmpty()) return;
 
-        EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
-            EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
-            if (component == null) return;
+		EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
+			EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
+			if (component == null) return;
 
-            EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
-            component.getEffects().forEach((entry, level) -> {
-                if (entry.value().slotMatches(slot)) {
-					contextAwareConsumer.accept(entry, level, context);
-                }
-            });
-        });
+			EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
+			component.getEffects().forEach((entry, level) -> {
+				if (entry.value().slotMatches(slot)) {
+					consumer.accept((RegistryEntry<T>) entry, level, context);
+				}
+			});
+		});
     }
 
-    public static void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer consumer) {
+    public static void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer<?> consumer) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             forEachEffectHolder(entity.getEquippedStack(slot), slot, entity, consumer);
         }
@@ -81,13 +90,13 @@ public class EffectHolderHelper {
 
 
     @FunctionalInterface
-    public interface Consumer {
-        void accept(RegistryEntry<? extends EffectHolder> enchantment, int level);
+    public interface Consumer<T extends EffectHolder> {
+        void accept(RegistryEntry<T> entry, int level);
     }
 
     @FunctionalInterface
-    public interface ContextAwareConsumer {
-        void accept(RegistryEntry<? extends EffectHolder> enchantment, int level, EnchantmentEffectContext context);
+    public interface ContextAwareConsumer<T extends EffectHolder> {
+        void accept(RegistryEntry<T> entry, int level, EnchantmentEffectContext context);
     }
 
 }

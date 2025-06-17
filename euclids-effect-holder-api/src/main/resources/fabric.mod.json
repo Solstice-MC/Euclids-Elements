@@ -16,8 +16,10 @@
 			"net/minecraft/enchantment/Enchantment": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolder" ],
 			"net/minecraft/enchantment/Enchantment\u0024Definition": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolder\u0024Definition" ],
 			"net/minecraft/component/type/ItemEnchantmentsComponent": [ "org/solstice/euclidsElements/effectHolder/api/component/EffectHolderComponent<Lnet/minecraft/enchantment/Enchantment;>" ],
-			"net/minecraft/enchantment/EnchantmentHelper\u0024Consumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024Consumer" ],
-			"net/minecraft/enchantment/EnchantmentHelper\u0024ContextAwareConsumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024ContextAwareConsumer" ],
+
+			"net/minecraft/enchantment/EnchantmentHelper\u0024Consumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024Consumer<Lnet/minecraft/enchantment/Enchantment;>" ],
+			"net/minecraft/enchantment/EnchantmentHelper\u0024ContextAwareConsumer": [ "org/solstice/euclidsElements/effectHolder/api/EffectHolderHelper\u0024ContextAwareConsumer<Lnet/minecraft/enchantment/Enchantment;>" ],
+
 			"net/minecraft/entity/LivingEntity": [ "org/solstice/euclidsElements/effectHolder/api/entity/EntityEffectHolderData" ]
 		}
 	},

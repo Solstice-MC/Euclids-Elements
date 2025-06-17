@@ -1,5 +1,6 @@
 moduleDependencies(project, [
-	'euclids-base-api'
+	'euclids-base-api',
+	'euclids-component-holder-api',
 ])
 
 loom {

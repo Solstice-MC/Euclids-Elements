@@ -1,0 +1,25 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-tag-api",
+	"version": "${mod_version}",
+
+	"name": "Euclid's Tag API",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [
+			"org.solstice.euclidsElements.tag.EuclidsTagAPI"
+		]
+	},
+	"mixins": [ "euclids-tag-api.mixins.json" ],
+	"accessWidener": "euclids-tag-api.accesswidener",
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/registry/entry/RegistryEntry": [ "org/solstice/euclidsElements/tag/api/registry/MapTagRegistryEntryHolder<TT;>" ]
+		}
+	},
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
+}

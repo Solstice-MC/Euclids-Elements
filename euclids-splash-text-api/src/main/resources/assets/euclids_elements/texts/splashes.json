@@ -1,5 +1,5 @@
 {
-	"entries": [
+	"values": [
 		"Iconic!",
 		{ "value": "Testing!" },
 		{ "value": "Today is the day!", "date": "05 Aug", "weight": 128 }

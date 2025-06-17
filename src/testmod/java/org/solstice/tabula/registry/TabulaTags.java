@@ -5,7 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
-import org.solstice.euclidsElements.mapTag.api.MapTagKey;
+import org.solstice.euclidsElements.tag.api.MapTagKey;
 import org.solstice.tabula.Tabula;
 import org.solstice.tabula.content.HumorValue;
 

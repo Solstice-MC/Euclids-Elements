@@ -1,12 +1,16 @@
 package org.solstice.euclidsElements.audio.mixin;
 
 import com.google.common.collect.Maps;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import net.minecraft.client.sound.*;
 import net.minecraft.resource.ResourceFactory;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import org.solstice.euclidsElements.audio.api.SoundTypeManager;
 import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -18,15 +22,11 @@ import java.util.concurrent.CompletionException;
 public class SoundLoaderMixin {
 
 	@Shadow @Final private ResourceFactory resourceFactory;
-	@Shadow @Final private final Map<Identifier, CompletableFuture<StaticSound>> loadedSounds = Maps.newHashMap();
+	@Shadow @Final private Map<Identifier, CompletableFuture<StaticSound>> loadedSounds = Maps.newHashMap();
 
-	/**
-	 * @author Solstice
-	 * @reason Multiple audio format support
-	 */
-	@Overwrite
-	public CompletableFuture<StaticSound> loadStatic(Identifier truePath) {
-		return this.loadedSounds.computeIfAbsent(truePath, path -> CompletableFuture.supplyAsync(() -> {
+	@Inject(method = "loadStatic(Lnet/minecraft/util/Identifier;)Ljava/util/concurrent/CompletableFuture;", at = @At("HEAD"), cancellable = true)
+	public void loadStatic(Identifier truePath, CallbackInfoReturnable<CompletableFuture<StaticSound>> cir) {
+		CompletableFuture<StaticSound> result = this.loadedSounds.computeIfAbsent(truePath, path -> CompletableFuture.supplyAsync(() -> {
 			try {
 				NonRepeatingAudioStream stream = SoundTypeManager.staticStream(this.resourceFactory, path);
 				ByteBuffer byteBuffer = stream.readAll();
@@ -35,22 +35,20 @@ public class SoundLoaderMixin {
 				throw new CompletionException(exception);
 			}
 		}, Util.getDownloadWorkerExecutor()));
+		cir.setReturnValue(result);
 	}
 
-	/**
-	 * @author Solstice
-	 * @reason Multiple audio format support
-	 */
-	@Overwrite
-	public CompletableFuture<AudioStream> loadStreamed(Identifier path, boolean repeatInstantly) {
-		return CompletableFuture.supplyAsync(() -> {
+	@Inject(method = "loadStreamed", at = @At("HEAD"), cancellable = true)
+	public void loadStreamed(Identifier path, boolean looping, CallbackInfoReturnable<CompletableFuture<AudioStream>> cir) {
+		CompletableFuture<AudioStream> result = CompletableFuture.supplyAsync(() -> {
 			try {
-				if (repeatInstantly) return SoundTypeManager.repeatingStream(this.resourceFactory, path);
+				if (looping) return SoundTypeManager.repeatingStream(this.resourceFactory, path);
 				return SoundTypeManager.staticStream(this.resourceFactory, path);
-			} catch (IOException iOException) {
-				throw new CompletionException(iOException);
+			} catch (IOException exception) {
+				throw new CompletionException(exception);
 			}
 		}, Util.getDownloadWorkerExecutor());
+		cir.setReturnValue(result);
 	}
 
 }

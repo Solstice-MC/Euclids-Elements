@@ -19,11 +19,8 @@ public class RecipeBookWidgetMixin {
 	@Shadow
 	protected MinecraftClient client;
 
-	/**
-	 * @author Solstice
-	 * @reason Replace RecipeBookWidget
-	 */
-	@Overwrite
+
+	@WrapOperation('toggleFilteringCraftable')
 	private boolean toggleFilteringCraftable() {
 		RecipeBookCategory recipeBookCategory = this.craftingScreenHandler.getCategory();
 		boolean bl = !this.recipeBook.isFilteringCraftable(recipeBookCategory);
@@ -31,11 +28,7 @@ public class RecipeBookWidgetMixin {
 		return bl;
 	}
 
-	/**
-	 * @author Solstice
-	 * @reason Replace RecipeBookWidget
-	 */
-	@Overwrite
+	@WrapOperation('sendBookDataPacket')
 	protected void sendBookDataPacket() {
 		if (this.client.getNetworkHandler() == null) return;
 

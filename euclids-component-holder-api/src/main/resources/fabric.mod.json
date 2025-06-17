@@ -6,6 +6,9 @@
     "name": "Euclid's Component Holder API",
     "authors": [ "Solstice" ],
 
+	"entrypoints": {
+		"main": [ "org.solstice.euclidsElements.componentHolder.EuclidsComponentHolderAPI" ]
+	},
 	"mixins": [
 		"euclids-component-holder-api.mixins.json"
 	],

@@ -3,7 +3,8 @@
 	"minVersion": "0.8",
 	"package": "org.solstice.euclidsElements.splashText.mixin",
 	"client": [
-		"MinecraftClientMixin"
+		"MinecraftClientMixin",
+		"TitleScreenMixin"
 	],
 	"compatibilityLevel": "JAVA_17"
 }
