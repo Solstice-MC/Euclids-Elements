@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "euclids-content",
-	"version": "${mod_version}",
+	"version": "${module_version}",
 
 	"name": "Euclid's Content",
 	"authors": [ "Solstice" ],

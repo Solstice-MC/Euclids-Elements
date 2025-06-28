@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.tag.api;
+package org.solstice.euclidsElements.tag.content.mapTag;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public record MapTagEntry(Identifier id, boolean tag) {
 
@@ -27,15 +28,31 @@ public record MapTagEntry(Identifier id, boolean tag) {
 		return this.tag ? "#" + this.id : this.id.toString();
 	}
 
+//	public <T> List<RegistryEntry<T>> getEntries(RegistryWrapper<T> registry) {
+//		List<RegistryEntry<T>> result = new ArrayList<>();
+//
+//		if (this.tag) {
+//			registry.streamTags()
+//				.filter(list -> list.getTag().id().equals(this.id))
+//				.forEach(list -> list.forEach(result::add));
+//		} else {
+//			registry.streamEntries().filter(entry -> entry.matchesId(this.id))
+//				.findFirst()
+//				.ifPresent(result::add);
+//		}
+//
+//		return result;
+//	}
+
 	public <T> List<RegistryEntry<T>> getEntries(Registry<T> registry) {
 		List<RegistryEntry<T>> result = new ArrayList<>();
 
-
 		if (this.tag) {
-			TagKey<T> tag = registry.streamTags()
+			Optional<TagKey<T>> tag = registry.streamTags()
 				.filter(key -> key.id().equals(this.id))
-				.findFirst().get();
-			registry.getOrCreateEntryList(tag).stream()
+				.findFirst();
+			if (tag.isEmpty()) return result;
+			registry.getOrCreateEntryList(tag.get()).stream()
 				.forEach(result::add);
 		} else {
 			result.add(registry.getEntry(this.id).orElseThrow());
@@ -43,6 +60,23 @@ public record MapTagEntry(Identifier id, boolean tag) {
 
 		return result;
 	}
+
+//	public <T> List<RegistryEntry<T>> getEntries(Registry<T> registry) {
+//		List<RegistryEntry<T>> result = new ArrayList<>();
+//
+//
+//		if (this.tag) {
+//			TagKey<T> tag = registry.streamTags()
+//				.filter(key -> key.id().equals(this.id))
+//				.findFirst().get();
+//			registry.getOrCreateEntryList(tag).stream()
+//				.forEach(result::add);
+//		} else {
+//			result.add(registry.getEntry(this.id).orElseThrow());
+//		}
+//
+//		return result;
+//	}
 
 	@Override
 	public @NotNull String toString() {

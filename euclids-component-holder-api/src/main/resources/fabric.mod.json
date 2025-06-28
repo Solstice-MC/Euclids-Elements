@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "euclids-component-holder-api",
-    "version": "${mod_version}",
+    "version": "${module_version}",
 
     "name": "Euclid's Component Holder API",
     "authors": [ "Solstice" ],

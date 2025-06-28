@@ -9,17 +9,6 @@ import org.solstice.euclidsElements.content.registry.*;
 
 public class EuclidsContent implements ModInitializer {
 
-    public static final String MOD_ID = "euclids_elements";
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-
-    public static Identifier of(String path) {
-        return Identifier.of(MOD_ID, path);
-    }
-
-	public static boolean isModLoaded(String mod) {
-		return FabricLoader.getInstance().isModLoaded(mod);
-	}
-
 	@Override
 	public void onInitialize() {
 		EuclidsComponentTypes.init();

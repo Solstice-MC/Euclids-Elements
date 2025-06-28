@@ -4,10 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.solstice.tabula.registry.TabulaAdvancements;
-import org.solstice.tabula.registry.TabulaBlocks;
-import org.solstice.tabula.registry.TabulaComponentTypes;
-import org.solstice.tabula.registry.TabulaItems;
+import org.solstice.tabula.registry.*;
 
 public class Tabula implements ModInitializer {
 
@@ -20,6 +17,8 @@ public class Tabula implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		TabulaTags.init();
+
 		TabulaItems.init();
 		TabulaBlocks.init();
 		TabulaComponentTypes.init();

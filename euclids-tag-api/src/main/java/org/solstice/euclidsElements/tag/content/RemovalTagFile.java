@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.tag.api;
+package org.solstice.euclidsElements.tag.content;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

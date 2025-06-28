@@ -4,7 +4,6 @@ repositories {
 
 dependencies {
 	include implementation('org.concentus:Concentus:1.0-SNAPSHOT')
-//	include implementation('de.maxhenkel.opus4j:opus4j:2.0.2')
 }
 
 loom {

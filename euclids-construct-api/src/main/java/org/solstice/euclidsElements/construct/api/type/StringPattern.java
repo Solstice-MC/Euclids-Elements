@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
+import org.solstice.euclidsElements.construct.api.blockPattern.EuclidsBlockPatternBuilder;
 import org.solstice.euclidsElements.util.EuclidsCodecs;
 
 import java.util.Arrays;
@@ -13,17 +14,20 @@ import java.util.Map;
 public interface StringPattern {
 
 	Codec<StringPattern> CODEC = EuclidsCodecs.merge(Pattern1D.CODEC, Pattern2D.CODEC);
+	StringPattern EMPTY = new Pattern1D("");
 
 	BlockPattern generateBlockPattern(Map<Character, Blockish> keys);
 
 	default BlockPattern generateSimple(Map<Character, Blockish> keys, String... pattern) {
-		var builder = BlockPatternBuilder.start();
+		BlockPatternBuilder builder = BlockPatternBuilder.start();
 
 		builder = builder.aisle(pattern);
 		for (Character key : keys.keySet()) {
 			var blockish = keys.get(key);
 			builder.where(key, CachedBlockPosition.matchesBlockState(blockish.match()));
 		}
+		((EuclidsBlockPatternBuilder)builder).addStringPattern(this);
+		((EuclidsBlockPatternBuilder)builder).addKeys(keys);
 
 		return builder.build();
 	}
@@ -71,7 +75,7 @@ public interface StringPattern {
 //		@Override
 //		@SuppressWarnings("unchecked")
 //		public BlockPattern generateBlockPattern(Map<Character, Blockish> keys) {
-////			validate(keys);
+//			validate(keys);
 //			var size = getSize();
 //			Predicate<CachedBlockPosition>[][][] predicates = (Predicate<CachedBlockPosition>[][][]) Array.newInstance(
 //					Predicate.class,

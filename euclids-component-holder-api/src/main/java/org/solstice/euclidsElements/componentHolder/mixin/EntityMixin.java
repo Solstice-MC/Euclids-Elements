@@ -30,21 +30,21 @@ public class EntityMixin implements AdvancedComponentHolder {
 	private static final Codec<ComponentMap> COMPONENT_CODEC = ComponentMap.CODEC.optionalFieldOf("components", ComponentMap.EMPTY).codec();
 
 	@Unique
-	private static final TrackedData<ComponentMapImpl> CUSTOM_COMPONENTS = DataTracker.registerData(Entity.class, EuclidsTrackedDataHandlers.COMPONENT_MAP);
+	private static final TrackedData<ComponentMapImpl> TRACKED_COMPONENTS = DataTracker.registerData(Entity.class, EuclidsTrackedDataHandlers.COMPONENT_MAP);
 
 	@Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V"))
 	private void addDataTrackers(CallbackInfo ci, @Local DataTracker.Builder builder) {
-		builder.add(CUSTOM_COMPONENTS, new ComponentMapImpl(ComponentMap.EMPTY));
+		builder.add(TRACKED_COMPONENTS, new ComponentMapImpl(ComponentMap.EMPTY));
 	}
 
 	@Override
 	public ComponentMapImpl getComponents() {
-		return this.dataTracker.get(CUSTOM_COMPONENTS);
+		return this.dataTracker.get(TRACKED_COMPONENTS);
 	}
 
 	@Override
 	public void setComponents(ComponentMapImpl components) {
-		this.dataTracker.set(CUSTOM_COMPONENTS, components);
+		this.dataTracker.set(TRACKED_COMPONENTS, components);
 	}
 
 	@Inject(method = "writeNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V"))

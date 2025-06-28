@@ -1,11 +1,11 @@
 package org.solstice.euclidsElements.construct.api.type;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.CarvedPumpkinBlock;
 import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -13,60 +13,52 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.solstice.euclidsElements.construct.api.entity.ConstructableEntity;
 
 public record Construct(BlockPattern pattern, Vec3i offset, EntityStack entity) {
 
-	public static final Codec<Character> CHAR_CODEC = Codec.STRING.xmap(s -> s.charAt(0), Object::toString);
-
-	private static final Codec<Map<Character, Blockish>> KEY_CODEC = Codec.unboundedMap(CHAR_CODEC, Blockish.CODEC);
+	public static final MapCodec<BlockPattern> PATTERN_CODEC = RawBlockPattern.PATTERN_CODEC.xmap(
+		RawBlockPattern::toBlockPattern,
+		RawBlockPattern::fromBlockPattern
+	);
 
 	public static final Codec<Construct> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			StringPattern.CODEC.fieldOf("pattern").forGetter(null),
-			KEY_CODEC.fieldOf("key").forGetter(null),
-			Vec3i.CODEC.fieldOf("offset").forGetter(null),
-			EntityStack.CODEC.fieldOf("entity").forGetter(null)
-	).apply(instance, Construct::create));
+			PATTERN_CODEC.forGetter(Construct::pattern),
+			Vec3i.CODEC.fieldOf("offset").forGetter(Construct::offset),
+			EntityStack.CODEC.fieldOf("entity").forGetter(Construct::entity)
+	).apply(instance, Construct::new));
 
 	public JsonObject toJson() {
-		return CODEC.encode(this, JsonOps.INSTANCE, null).getOrThrow().getAsJsonObject();
-	}
-
-	public static Construct create (
-			StringPattern rawPattern,
-			Map<Character, Blockish> keys,
-			Vec3i offset,
-			EntityStack entity
-	) {
-		keys = modifyKeys(keys);
-		var pattern = rawPattern.generateBlockPattern(keys);
-		return new Construct(pattern, offset, entity);
-	}
-
-	public static Map<Character, Blockish> modifyKeys(Map<Character, Blockish> keys) {
-		var copy = new HashMap<>(keys);
-		copy.put(' ', new Blockish.BlockEntry(Blocks.AIR));
-		return ImmutableMap.copyOf(copy);
-	}
-
-	public BlockPos offsetPosition(BlockPattern.Result result) {
-		return result.translate(offset.getX(), offset.getY(), offset.getZ()).getBlockPos();
+		return CODEC.encodeStart(JsonOps.INSTANCE, this).getOrThrow().getAsJsonObject();
 	}
 
 	public boolean canConstruct(WorldView world, BlockPos pos) {
-		return pattern.searchAround(world, pos) != null;
+		return this.pattern.searchAround(world, pos) != null;
+	}
+
+	public void trySpawn(World world, BlockPos pos) {
+		BlockPattern.Result result = this.matchPattern(world, pos);
+		if (result == null) return;
+
+		Entity entity = this.createEntity(world);
+		if (entity == null) return;
+
+		CarvedPumpkinBlock.spawnEntity(world, result, entity, this.offsetPosition(result));
+		if (entity instanceof ConstructableEntity constructable) constructable.onConstructed(result, world, pos);
+	}
+
+	public BlockPos offsetPosition(BlockPattern.Result result) {
+		return result.translate(this.offset.getX(), this.offset.getY(), this.offset.getZ()).getBlockPos();
 	}
 
 	@Nullable
 	public BlockPattern.Result matchPattern(WorldView world, BlockPos pos) {
-		return pattern.searchAround(world, pos);
+		return this.pattern.searchAround(world, pos);
 	}
 
 	@Nullable
 	public Entity createEntity(World world) {
-		return entity.create(world);
+		return this.entity.create(world);
 	}
 
 }

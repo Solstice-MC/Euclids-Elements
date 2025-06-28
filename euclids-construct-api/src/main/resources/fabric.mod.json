@@ -1,7 +1,7 @@
 {
     "schemaVersion": 1,
     "id": "euclids-construct-api",
-    "version": "${mod_version}",
+    "version": "${module_version}",
 
     "name": "Euclid's Construct API",
     "authors": [ "Solstice" ],
@@ -10,6 +10,7 @@
 		"main": [ "org.solstice.euclidsElements.construct.EuclidsConstructAPI" ]
 	},
     "mixins": [ "euclids-construct-api.mixins.json" ],
+	"accessWidener": "euclids-construct-api.accesswidener",
 
 	"depends": {
 		"euclids-base-api": "*"

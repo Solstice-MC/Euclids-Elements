@@ -11,6 +11,8 @@ import org.solstice.tabula.content.HumorValue;
 
 public class TabulaTags {
 
+	public static void init() {}
+
 	public static final MapTagKey<Block, HumorValue> HUMOROUS = ofMap(RegistryKeys.BLOCK, HumorValue.CODEC, "humorous");
 
 	public static <T, R> MapTagKey<T, R> ofMap(RegistryKey<Registry<T>> registry, Codec<R> codec, String name) {

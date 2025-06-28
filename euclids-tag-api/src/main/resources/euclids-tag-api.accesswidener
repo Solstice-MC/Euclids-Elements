@@ -6,3 +6,6 @@ accessible field net/minecraft/registry/tag/TagEntry tag Z
 accessible field net/minecraft/registry/tag/TagEntry required Z
 accessible class net/minecraft/server/DataPackContents$ConfigurableWrapperLookup
 accessible field net/minecraft/server/DataPackContents$ConfigurableWrapperLookup dynamicRegistryManager Lnet/minecraft/registry/DynamicRegistryManager;
+
+accessible field net/minecraft/server/network/ServerCommonNetworkHandler connection Lnet/minecraft/network/ClientConnection;
+accessible field net/minecraft/network/ClientConnection channel Lio/netty/channel/Channel;

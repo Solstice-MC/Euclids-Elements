@@ -1,10 +1,7 @@
 package org.solstice.euclidsElements.effectHolder.api;
 
 import net.minecraft.component.ComponentType;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -17,7 +14,6 @@ import net.minecraft.server.MinecraftServer;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.effectHolder.api.component.EffectHolderComponent;
-import org.solstice.euclidsElements.effectHolder.mixin.EnchantmentHelperMixin;
 import org.solstice.euclidsElements.util.RegistryHelper;
 
 import java.util.ArrayList;

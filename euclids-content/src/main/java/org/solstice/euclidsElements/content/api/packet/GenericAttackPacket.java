@@ -12,9 +12,7 @@ import net.minecraft.network.packet.CustomPayload;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.content.api.item.GenericAttackingItem;
 
-public record GenericAttackPacket(
-	ItemStack stack
-) implements CustomPayload {
+public record GenericAttackPacket(ItemStack stack) implements CustomPayload {
 
 	public static final Codec<GenericAttackPacket> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 		ItemStack.CODEC.fieldOf("stack").forGetter(GenericAttackPacket::stack)

@@ -1,10 +1,11 @@
 package org.solstice.euclidsElements.util;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.function.Function;
 
 public class EuclidsCodecs {
 
@@ -15,30 +16,61 @@ public class EuclidsCodecs {
 		date -> date.format(FORMAT)
 	);
 
-	public static <Type> Codec<Type> merge(
-		Codec<? extends Type> codec1,
-		Codec<? extends Type> codec2
-	) {
-		return Codec.either(codec1, codec2).flatComapMap(
-			either -> {
-				if (either.left().isPresent()) return either.left().get();
-				if (either.right().isPresent()) return either.right().get();
-				return null;
-			}, null
-		);
+	@SuppressWarnings("unchecked")
+	public static <T> Codec<T> merge(Codec<? extends T> primary, Codec<? extends T>... alternatives) {
+		return new MergedCodec<>((Codec<T>) primary, (Codec<T>[]) alternatives);
 	}
 
-	public static <T> MapCodec<T> merge(
-		MapCodec<? extends T> codec1,
-		MapCodec<? extends T> codec2
-	) {
-		return Codec.mapEither(codec1, codec2).xmap(
-			either -> {
-				if (either.left().isPresent()) return either.left().get();
-				if (either.right().isPresent()) return either.right().get();
-				return null;
-			}, null
-		);
+	public record MergedCodec<T>(Codec<T> primary, Codec<T>... alternatives) implements Codec<T> {
+
+		@SafeVarargs
+		public MergedCodec {}
+
+		@Override
+		public <T1> DataResult<T1> encode(T input, DynamicOps<T1> ops, T1 prefix) {
+			DataResult<T1> result = DataResult.error(() -> "Failed to merge codecs");
+
+			try {
+				result = primary.encode(input, ops, prefix)
+					.ifError(error -> {});
+				if (result.isSuccess()) return result;
+			} catch (Exception ignored) {}
+
+
+			for (Codec<T> alternative : alternatives) {
+				try {
+					result = alternative.encode(input, ops, prefix)
+						.ifError(error -> {});
+					if (result.isSuccess()) return result;
+				} catch (Exception ignored) {}
+			}
+
+			return result;
+		}
+
+		@Override
+		public <T1> DataResult<Pair<T, T1>> decode(DynamicOps<T1> ops, T1 input) {
+			DataResult<Pair<T, T1>> result = DataResult.error(() -> "Failed to merge codecs");
+
+			try {
+				result = primary.decode(ops, input)
+					.ifError(error -> {});
+				if (result.isSuccess()) return result;
+			} catch (Exception ignored) {}
+
+			for (Codec<T> alternative : alternatives) {
+				try {
+					result = alternative.decode(ops, input)
+						.ifError(error -> {
+						})
+						.map(pair -> pair.mapFirst(Function.identity()));
+					if (result.isSuccess()) return result;
+				} catch (Exception ignored) {}
+			}
+
+			return result;
+		}
+
 	}
 
 }

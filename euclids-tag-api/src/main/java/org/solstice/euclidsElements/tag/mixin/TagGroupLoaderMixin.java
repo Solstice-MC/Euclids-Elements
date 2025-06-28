@@ -7,7 +7,7 @@ import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
-import org.solstice.euclidsElements.tag.api.RemovalTagFile;
+import org.solstice.euclidsElements.tag.content.RemovalTagFile;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

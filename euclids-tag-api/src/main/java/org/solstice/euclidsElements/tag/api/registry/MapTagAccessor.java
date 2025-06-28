@@ -1,14 +1,20 @@
 package org.solstice.euclidsElements.tag.api.registry;
 
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import org.jetbrains.annotations.Nullable;
 import org.solstice.euclidsElements.tag.api.MapTagKey;
 
 import java.util.Map;
 
-public interface MapTagRegistryEntryHolder<T> {
+public interface MapTagAccessor<T> {
 
-	default Map<MapTagKey<T, Object>, Object> getMapTags() {
+	default Map<MapTagKey<T, ?>, Map<RegistryKey<T>, ?>> getMapTags() {
 		return Map.of();
+	}
+
+	default RegistryKey<Registry<T>> getRegistryKey() {
+		return null;
 	}
 
 	default boolean isIn(MapTagKey<T, ?> mapTag) {
@@ -22,11 +28,11 @@ public interface MapTagRegistryEntryHolder<T> {
 
 	@SuppressWarnings("unchecked")
 	default <R> R getValue(MapTagKey<T, R> mapTag, R defaultValue) {
-		return (R) this.getMapTags().getOrDefault(mapTag, defaultValue);
-	}
-
-	default void addValue(MapTagKey<T, Object> mapTag, Object value) {
-		this.getMapTags().put(mapTag, value);
+		R result = (R) this.getMapTags()
+			.getOrDefault(mapTag, Map.of())
+			.getOrDefault(this.getRegistryKey(), null);
+		if (result == null) return defaultValue;
+		return result;
 	}
 
 }

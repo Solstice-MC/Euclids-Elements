@@ -7,6 +7,10 @@ plugins {
 apply from: "common.gradle"
 apply from: "functions.gradle"
 
+base.archivesName = mod_id
+version = mod_version
+group = mod_group
+
 sourceSets {
 	testmod {
 		compileClasspath += main.compileClasspath
@@ -48,6 +52,19 @@ dependencies {
 		include project("${it.path}")
 	}
 }
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
 
 publishing {
 	publications {

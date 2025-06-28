@@ -5,54 +5,75 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.solstice.euclidsElements.tag.content.mapTag.MapTagManager;
 
 public class MapTagKey<T, R> {
 
-	private final RegistryKey<Registry<T>> registry;
-	private final Codec<R> codec;
-	private final Identifier id;
+	protected final RegistryKey<Registry<T>> registryReference;
+	protected final Codec<R> codec;
+	protected final Codec<R> networkCodec;
+	protected final Identifier id;
 
-	public RegistryKey<Registry<T>> getRegistry() {
-		return registry;
+	public RegistryKey<Registry<T>> getRegistryReference() {
+		return registryReference;
 	}
 
 	public Codec<R> getCodec() {
 		return codec;
 	}
 
+	public Codec<R> getNetworkCodec() {
+		return networkCodec;
+	}
+
 	public Identifier getId() {
 		return id;
 	}
 
-	protected MapTagKey (
+	protected MapTagKey(
 		RegistryKey<Registry<T>> registry,
 		Codec<R> codec,
+		Codec<R> networkCodec,
 		Identifier id
 	) {
-		this.registry = registry;
+		this.registryReference = registry;
 		this.codec = codec;
+		this.networkCodec = networkCodec;
 		this.id = id;
 	}
 
-	public static <T, R> MapTagKey<T, R> of(RegistryKey<Registry<T>> registry, Codec<R> codec, Identifier id) {
-		MapTagKey<T, R> key = new MapTagKey<>(registry, codec, id);
-		MapTagManager.add(key);
+	public static <T, R> MapTagKey<T, R> of(
+		RegistryKey<Registry<T>> registryReference,
+		Codec<R> codec,
+		Identifier id
+	) {
+		return MapTagKey.of(registryReference, codec, codec, id);
+	}
+
+	public static <T, R> MapTagKey<T, R> of(
+		RegistryKey<Registry<T>> registryReference,
+		Codec<R> codec,
+		Codec<R> networkCodec,
+		Identifier id
+	) {
+		MapTagKey<T, R> key = new MapTagKey<>(registryReference, codec, networkCodec, id);
+		MapTagManager.registerMapTag(key);
 		return key;
 	}
 
 	public boolean isOf(RegistryKey<? extends Registry<?>> registry) {
-		return this.registry == registry;
+		return this.registryReference == registry;
 	}
 
 	@Override
 	public String toString() {
-		return "MapTagKey[" + this.registry.getValue() + " / " + this.codec.toString() + " / " + this.id + "]";
+		return "MapTagKey[" + this.registryReference.getValue() + " / " + this.codec.toString() + " / " + this.id + "]";
 	}
 
 	public String getTranslationKey() {
 		StringBuilder builder = new StringBuilder("map_tag.");
 
-		Identifier registryId = this.registry.getValue();
+		Identifier registryId = this.registryReference.getValue();
 		if (!registryId.getNamespace().equals("minecraft"))
 			builder.append(registryId.getNamespace()).append(".");
 

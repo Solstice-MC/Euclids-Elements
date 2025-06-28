@@ -8,10 +8,7 @@ import net.minecraft.data.DataWriter;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3i;
-import org.solstice.euclidsElements.construct.api.type.Blockish;
-import org.solstice.euclidsElements.construct.api.type.Construct;
-import org.solstice.euclidsElements.construct.api.type.EntityStack;
-import org.solstice.euclidsElements.construct.api.type.StringPattern;
+import org.solstice.euclidsElements.construct.api.type.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,47 +72,22 @@ public abstract class ConstructProvider implements DataProvider {
 		}
 
 		public ConstructsBuilder add(
-				String path,
-				StringPattern pattern,
-				Map<Character, Blockish> keys,
-				Vec3i offset,
-				EntityStack entity
+			String path,
+			BlockPattern pattern,
+			Vec3i offset,
+			EntityStack stack
 		) {
-			var data = Construct.create(pattern, keys, offset, entity);
-			add(path, data);
-			return this;
+			return this.add(path, new Construct(pattern, offset, stack));
 		}
 
 		public ConstructsBuilder add(
-				String path,
-				StringPattern pattern,
-				Map<Character, Blockish> keys,
-				EntityStack entity
+			String path,
+			StringPattern pattern,
+			Map<Character, Blockish> keys,
+			Vec3i offset,
+			EntityStack stack
 		) {
-			var data = Construct.create(pattern, keys, Vec3i.ZERO, entity);
-			add(path, data);
-			return this;
-		}
-
-		public ConstructsBuilder add(
-				String path,
-				BlockPattern pattern,
-				Vec3i offset,
-				EntityStack entity
-		) {
-			var data = new Construct(pattern, offset, entity);
-			add(path, data);
-			return this;
-		}
-
-		public ConstructsBuilder add(
-				String path,
-				BlockPattern pattern,
-				EntityStack entity
-		) {
-			var data = new Construct(pattern, Vec3i.ZERO, entity);
-			add(path, data);
-			return this;
+			return this.add(path, new RawBlockPattern(pattern, keys).toBlockPattern(), offset, stack);
 		}
 
 	}

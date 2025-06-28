@@ -3,8 +3,6 @@ package org.solstice.euclidsElements.construct;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
 import net.minecraft.block.*;
-import net.minecraft.block.pattern.BlockPattern;
-import net.minecraft.entity.Entity;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
@@ -14,8 +12,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.construct.api.dispenser.ConstructBlockPlacementDispenserBehavior;
-import org.solstice.euclidsElements.construct.api.entity.ConstructableEntity;
-import org.solstice.euclidsElements.construct.mixin.CarvedPumpkinBlockInvoker;
 import org.solstice.euclidsElements.construct.api.type.Construct;
 
 public class EuclidsConstructAPI implements ModInitializer {
@@ -45,18 +41,7 @@ public class EuclidsConstructAPI implements ModInitializer {
 	public static void trySpawnConstructs(World world, BlockPos pos) {
 		Block block = world.getBlockState(pos).getBlock();
 		if (isConstructBlock(block)) world.getRegistryManager().get(REGISTRY_KEY)
-			.forEach(construct -> trySpawnConstruct(world, pos, construct));
-	}
-
-	public static void trySpawnConstruct(World world, BlockPos pos, Construct construct) {
-		BlockPattern.Result result = construct.matchPattern(world, pos);
-		if (result == null) return;
-
-		Entity entity = construct.createEntity(world);
-		if (entity == null) return;
-
-		CarvedPumpkinBlockInvoker.invokeSpawnEntity(world, result, entity, construct.offsetPosition(result));
-		if (entity instanceof ConstructableEntity constructable) constructable.onConstructed(result, world, pos);
+			.forEach(construct -> construct.trySpawn(world, pos));
 	}
 
 	public static boolean canDispense(WorldView world, BlockPos pos) {

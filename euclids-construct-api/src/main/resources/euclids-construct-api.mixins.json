@@ -6,9 +6,9 @@
 		"BlockFixMixins$CarvedPumpkinBlockMixin",
 		"BlockFixMixins$WitherSkullBlockMixin",
 		"BlockItemMixin",
-		"CarvedPumpkinBlockInvoker",
-		"EntityConstructionFixMixins$IronGolemMixin",
-		"EntityConstructionFixMixins$WitherEntityMixin"
+		"blockPattern.BlockPatternBuilderMixin",
+		"entity.IronGolemEntityMixin",
+		"entity.WitherEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

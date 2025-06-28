@@ -14,9 +14,10 @@ import java.nio.ByteOrder;
 
 @Environment(EnvType.CLIENT)
 public class OpusAudioStream implements BufferedAudioStream {
-    private static final int SAMPLE_RATE = 48000; // Opus standard sample rate
-    private static final int CHANNELS = 2; // Stereo by default
-    private static final float FLOAT_SCALE = 1.0f / 32768.0f; // Convert from short to float
+
+    private static final int SAMPLE_RATE = 48000;
+    private static final int CHANNELS = 2;
+    private static final float FLOAT_SCALE = 1.0f / 32768.0f;
 
     private final InputStream stream;
     private final AudioFormat format;
@@ -31,10 +32,8 @@ public class OpusAudioStream implements BufferedAudioStream {
 		outputByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
         this.endOfStream = false;
 
-        // Initialize the Opus decoder with standard parameters
         try {
             this.decoder = new OpusDecoder(SAMPLE_RATE, CHANNELS);
-            // Create audio format matching the Opus decoder settings
             this.format = new AudioFormat((float) SAMPLE_RATE, 16, CHANNELS, true, false);
         } catch (Exception exception) {
             throw new RuntimeException("Failed to initialize Opus decoder", exception);
@@ -45,7 +44,6 @@ public class OpusAudioStream implements BufferedAudioStream {
     public boolean read(FloatConsumer consumer) throws IOException {
         if (this.endOfStream) return false;
 
-        // Read data from the input stream
         int bytesRead = this.stream.read(this.inputBuffer, 0, this.inputBuffer.length);
         if (bytesRead <= 0) {
             this.endOfStream = true;
@@ -53,13 +51,9 @@ public class OpusAudioStream implements BufferedAudioStream {
         }
 
         try {
-            // Create a byte array with just the read data
             byte[] packetData = new byte[bytesRead];
             System.arraycopy(this.inputBuffer, 0, packetData, 0, bytesRead);
 
-            // Decode the Opus packet
-            // Based on the error message, the decode method takes a byte array and a boolean
-            // The boolean likely indicates whether this is the last packet
             short[] decodedData = this.decoder.decode(packetData, false);
 			if (decodedData.length == 0) return false;
 

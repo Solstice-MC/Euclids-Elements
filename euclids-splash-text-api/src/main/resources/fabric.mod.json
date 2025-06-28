@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "euclids-splash-text-api",
-	"version": "${mod_version}",
+	"version": "${module_version}",
 
 	"name": "Euclid's Splash Text API",
 	"authors": [ "Solstice" ],

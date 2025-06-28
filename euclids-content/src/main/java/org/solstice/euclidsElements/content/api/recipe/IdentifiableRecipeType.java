@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.util.recipe;
+package org.solstice.euclidsElements.content.api.recipe;
 
 import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeType;

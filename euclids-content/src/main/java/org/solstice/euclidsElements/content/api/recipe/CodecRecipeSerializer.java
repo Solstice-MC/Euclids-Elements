@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.util.recipe;
+package org.solstice.euclidsElements.content.api.recipe;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryByteBuf;

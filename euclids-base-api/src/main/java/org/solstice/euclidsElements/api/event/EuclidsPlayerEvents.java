@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.content.api.event;
+package org.solstice.euclidsElements.api.event;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
