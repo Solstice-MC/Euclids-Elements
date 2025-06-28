@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public record KnownRegistryMapTagsReplyPacket(
+public record KnownRegistryMapTagsReplyPacket (
         Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> mapTags
 ) implements CustomPayload {
 

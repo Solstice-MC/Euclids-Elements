@@ -3,6 +3,9 @@ package org.solstice.euclidsElements.tag;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -16,8 +19,10 @@ import net.minecraft.util.Identifier;
 import org.solstice.euclidsElements.tag.api.MapTagKey;
 import org.solstice.euclidsElements.tag.content.mapTag.MapTagLoader;
 import org.solstice.euclidsElements.tag.content.mapTag.MapTagManager;
+import org.solstice.euclidsElements.tag.content.network.packets.KnownRegistryMapTagsPacket;
 import org.solstice.euclidsElements.tag.content.network.packets.KnownRegistryMapTagsReplyPacket;
 import org.solstice.euclidsElements.tag.content.network.packets.RegistryMapTagSyncPacket;
+import org.solstice.euclidsElements.tag.content.network.task.RegistryMapTagTask;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,11 +42,11 @@ public class EuclidsTagAPI implements ModInitializer {
 			loaderReference.get().apply();
 		});
 
-//		ServerConfigurationConnectionEvents.CONFIGURE.register(RegistryMapTagTask::register);
-//		PayloadTypeRegistry.configurationC2S().register(KnownRegistryMapTagsReplyPacket.ID, KnownRegistryMapTagsReplyPacket.PACKET_CODEC);
-//		PayloadTypeRegistry.configurationS2C().register(KnownRegistryMapTagsPacket.ID, KnownRegistryMapTagsPacket.PACKET_CODEC);
-//		PayloadTypeRegistry.playS2C().register(RegistryMapTagSyncPacket.ID, RegistryMapTagSyncPacket.PACKET_CODEC);
-//		ServerConfigurationNetworking.registerGlobalReceiver(KnownRegistryMapTagsReplyPacket.ID, KnownRegistryMapTagsReplyPacket::handle);
+		ServerConfigurationConnectionEvents.CONFIGURE.register(RegistryMapTagTask::register);
+		PayloadTypeRegistry.configurationC2S().register(KnownRegistryMapTagsReplyPacket.ID, KnownRegistryMapTagsReplyPacket.PACKET_CODEC);
+		PayloadTypeRegistry.configurationS2C().register(KnownRegistryMapTagsPacket.ID, KnownRegistryMapTagsPacket.PACKET_CODEC);
+		PayloadTypeRegistry.playS2C().register(RegistryMapTagSyncPacket.ID, RegistryMapTagSyncPacket.PACKET_CODEC);
+		ServerConfigurationNetworking.registerGlobalReceiver(KnownRegistryMapTagsReplyPacket.ID, KnownRegistryMapTagsReplyPacket::handle);
 
 		ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS.register(EuclidsTagAPI::syncMapTags);
 	}
@@ -52,11 +57,11 @@ public class EuclidsTagAPI implements ModInitializer {
 		DynamicRegistryManager.Immutable registryManager = server.getRegistryManager();
 
 		MapTagManager.getMapTags().forEach((registryReference, values) -> {
-			var registry = registryManager.getOptional(registryReference);
+			Optional<Registry<Object>> registry = registryManager.getOptional(registryReference);
 
 			if (registry.isEmpty()) return;
 			if (!ServerPlayNetworking.canSend(player, RegistryMapTagSyncPacket.ID)) return;
-			if (player.networkHandler.connection.isLocal()) return;
+//			if (player.networkHandler.connection.isLocal()) return;
 
 			Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> playerMaps = player.networkHandler.connection.channel.attr(KnownRegistryMapTagsReplyPacket.KNOWN_MAP_TAGS).get();
 			if (playerMaps == null) return;
@@ -71,12 +76,13 @@ public class EuclidsTagAPI implements ModInitializer {
 		Map<Identifier, Map<RegistryKey<T>, ?>> result = new HashMap<>();
 		values.forEach(key -> {
 			MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registry.getKey(), key);
-			if (mapTag == null || mapTag.getNetworkCodec() == null) return;
+			if (mapTag == null || mapTag.getPacketCodec() == null) return;
 			result.put(key, registry.getMapTag(mapTag));
 		});
 
-		if (!result.isEmpty())
-			ServerPlayNetworking.send(player, new RegistryMapTagSyncPacket<>(registry.getKey(), result));
+		if (!result.isEmpty()) ServerPlayNetworking.send(player,
+			new RegistryMapTagSyncPacket<>(registry.getKey(), result)
+		);
 	}
 
 }

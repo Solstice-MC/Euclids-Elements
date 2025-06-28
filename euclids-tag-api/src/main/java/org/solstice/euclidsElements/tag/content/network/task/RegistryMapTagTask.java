@@ -29,8 +29,9 @@ public record RegistryMapTagTask(
         ServerConfigurationNetworkHandler listener
 ) implements ServerPlayerConfigurationTask {
 
-    public static final Identifier ID = EuclidsElements.of("registry_map_tag_task");
-    public static final Key KEY = new Key(ID.toString());
+    public static final Key KEY = new Key(
+		EuclidsElements.of("registry_map_tag_task").toString()
+	);
 
     @Override
     public Key getKey() {
@@ -39,28 +40,23 @@ public record RegistryMapTagTask(
 
     @Override
     public void sendPacket(Consumer<Packet<?>> task) {
-        this.run(customPacketPayload -> task.accept(ServerConfigurationNetworking.createS2CPacket(customPacketPayload)));
-    }
-
-	public static void register(ServerConfigurationNetworkHandler handler, MinecraftServer server) {
-		handler.addTask(new RegistryMapTagTask(handler));
-	}
-
-    public void run(Consumer<CustomPayload> sender) {
-        if (!ServerConfigurationNetworking.canSend(listener, KnownRegistryMapTagsPacket.ID)) {
+		if (!ServerConfigurationNetworking.canSend(listener, KnownRegistryMapTagsPacket.ID)) {
 			listener.completeTask(KEY);
 			return;
 		}
 
-		Map<RegistryKey<? extends Registry<?>>, List<KnownRegistryMapTagsPacket.KnownMapTag>> mapTags = new HashMap<>();
-        MapTagManager.getMapTags().forEach((key, values) -> {
-			List<KnownRegistryMapTagsPacket.KnownMapTag> list = new ArrayList<>();
-            values.forEach((id, mapTag) -> {
-                if (mapTag.getNetworkCodec() != null) list.add(new KnownRegistryMapTagsPacket.KnownMapTag(id));
-            });
-            mapTags.put(key, list);
-        });
-        sender.accept(new KnownRegistryMapTagsPacket(mapTags));
+		Map<RegistryKey<? extends Registry<?>>, List<Identifier>> mapTags = new HashMap<>();
+		MapTagManager.getMapTags().forEach((key, values) -> {
+			List<Identifier> list = new ArrayList<>(values.keySet());
+			mapTags.put(key, list);
+		});
+		KnownRegistryMapTagsPacket packet = new KnownRegistryMapTagsPacket(mapTags);
+
+		task.accept(ServerConfigurationNetworking.createS2CPacket(packet));
     }
+
+	public static void register(ServerConfigurationNetworkHandler handler, MinecraftServer s) {
+		handler.addTask(new RegistryMapTagTask(handler));
+	}
 
 }

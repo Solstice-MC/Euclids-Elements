@@ -2,8 +2,6 @@ package org.solstice.euclidsElements.tag.content.mapTag;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.registry.tag.TagEntry;
-import net.minecraft.util.dynamic.Codecs;
 import org.solstice.euclidsElements.tag.api.MapTagKey;
 
 import java.util.ArrayList;
@@ -15,8 +13,6 @@ public record MapTagData<R> (
 	List<MapTagEntry> removals,
 	boolean replace
 ) {
-
-	public static final Codec<TagEntry> ENTRY_CODEC = Codecs.TAG_ENTRY_ID.xmap(id -> new TagEntry(id, true), tagEntry -> null);
 
 	public static <R> Codec<MapTagData<R>> codec(MapTagKey<?, R> type) {
 		return RecordCodecBuilder.create(instance -> instance.group(

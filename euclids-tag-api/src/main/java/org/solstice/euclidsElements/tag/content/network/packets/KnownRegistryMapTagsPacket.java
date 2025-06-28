@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public record KnownRegistryMapTagsPacket(
-        Map<RegistryKey<? extends Registry<?>>, List<KnownMapTag>> mapTags
+	Map<RegistryKey<? extends Registry<?>>, List<Identifier>> mapTags
 ) implements CustomPayload {
 
     public static final Id<KnownRegistryMapTagsPacket> ID = new Id<>(
@@ -40,67 +40,21 @@ public record KnownRegistryMapTagsPacket(
     }
 
     public static final PacketCodec<PacketByteBuf, KnownRegistryMapTagsPacket> PACKET_CODEC = PacketCodec.tuple(
-            PacketCodecs.map(
-                    Maps::newHashMapWithExpectedSize,
-                    Identifier.PACKET_CODEC.xmap(RegistryKey::ofRegistry, RegistryKey::getValue),
-                    KnownMapTag.PACKET_CODEC.collect(PacketCodecs.toList())),
-            KnownRegistryMapTagsPacket::mapTags,
-            KnownRegistryMapTagsPacket::new);
-
-    public record KnownMapTag(Identifier id) {
-
-        public static final PacketCodec<PacketByteBuf, KnownMapTag> PACKET_CODEC = PacketCodec.tuple(
-                Identifier.PACKET_CODEC,
-                KnownMapTag::id,
-                KnownMapTag::new
-		);
-
-    }
+		PacketCodecs.map(
+			Maps::newHashMapWithExpectedSize,
+			Identifier.PACKET_CODEC.xmap(RegistryKey::ofRegistry, RegistryKey::getValue),
+			Identifier.PACKET_CODEC.collect(PacketCodecs.toList())),
+		KnownRegistryMapTagsPacket::mapTags,
+		KnownRegistryMapTagsPacket::new
+	);
 
 	@Environment(EnvType.CLIENT)
-	public static void handle(final KnownRegistryMapTagsPacket payload, final ClientConfigurationNetworking.Context context) {
-		record MandatoryEntry(RegistryKey<? extends Registry<?>> registry, Identifier id) {}
-		final Set<MandatoryEntry> ourMandatory = new HashSet<>();
-		MapTagManager.getMapTags().forEach((reg, values) -> values.values().forEach(attach -> {
-			ourMandatory.add(new MandatoryEntry(reg, attach.getId()));
-		}));
+	public static void handle(KnownRegistryMapTagsPacket payload, ClientConfigurationNetworking.Context context) {
+		Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> known = new HashMap<>();
+		MapTagManager.getMapTags().forEach((key, vals) ->
+			known.put(key, vals.keySet())
+		);
 
-		final Set<MandatoryEntry> theirMandatory = new HashSet<>();
-		payload.mapTags().forEach((reg, values) -> values.forEach(attach -> {
-			theirMandatory.add(new MandatoryEntry(reg, attach.id()));
-		}));
-
-		final List<Text> messages = new ArrayList<>();
-		final var missingOur = Sets.difference(ourMandatory, theirMandatory);
-		if (!missingOur.isEmpty()) {
-			messages.add(Text.translatable("neoforge.network.map_tags.missing_our", Text.literal(missingOur.stream()
-				.map(e -> e.id() + " (" + e.registry().getValue() + ")")
-				.collect(Collectors.joining(", "))).formatted(Formatting.GOLD)));
-		}
-
-		final var missingTheir = Sets.difference(theirMandatory, ourMandatory);
-		if (!missingTheir.isEmpty()) {
-			messages.add(Text.translatable("neoforge.network.map_tags.missing_their", Text.literal(missingTheir.stream()
-				.map(e -> e.id() + " (" + e.registry().getValue() + ")")
-				.collect(Collectors.joining(", "))).formatted(Formatting.GOLD)));
-		}
-
-		if (!messages.isEmpty()) {
-			MutableText message = Text.empty();
-			final var itr = messages.iterator();
-			while (itr.hasNext()) {
-				message = message.append(itr.next());
-				if (itr.hasNext()) {
-					message = message.append("\n");
-				}
-			}
-
-			context.responseSender().disconnect(message);
-			return;
-		}
-
-		final var known = new HashMap<RegistryKey<? extends Registry<?>>, Collection<Identifier>>();
-		MapTagManager.getMapTags().forEach((key, vals) -> known.put(key, vals.keySet()));
 		context.responseSender().sendPacket(new KnownRegistryMapTagsReplyPacket(known));
 	}
 

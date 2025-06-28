@@ -2,6 +2,7 @@ package org.solstice.euclidsElements.tag.content.mapTag;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.minecraft.registry.*;
@@ -32,17 +33,12 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 	}
 
 	private final DynamicRegistryManager registryManager;
-//	private final RegistryWrapper.WrapperLookup registryLookup;
 
 	private final Map<RegistryKey<? extends Registry<T>>, LoadResult<T, R>> results = new HashMap<>();
 
 	public MapTagLoader(DynamicRegistryManager registryManager) {
 		this.registryManager = registryManager;
 	}
-
-//	public MapTagLoader(RegistryWrapper.WrapperLookup registryLookup) {
-//		this.registryLookup = registryLookup;
-//	}
 
 	public static String getDirectory(Identifier id) {
 		String location = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE) ? "" : id.getNamespace() + "/";
@@ -114,16 +110,16 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 		RegistryKey<Registry<T>> registryKey,
 		List<Resource> resources
 	) {
-		var codec = MapTagData.codec(attachmentType);
+		Codec<MapTagData<R>> codec = MapTagData.codec(attachmentType);
 		List<MapTagData<R>> entries = new LinkedList<>();
 		for (Resource resource : resources) {
 			try (Reader reader = resource.getReader()) {
 				JsonElement element = JsonParser.parseReader(reader);
-				var test = codec.decode(ops, element).getOrThrow().getFirst();
-				entries.add(test);
+				MapTagData<R> data = codec.decode(ops, element).getOrThrow().getFirst();
+				entries.add(data);
 			} catch (Exception exception) {
-				EuclidsElements.LOGGER.error("Could not read data map of type {} for registry {}", attachmentType.getId(), registryKey,
-					exception
+				EuclidsElements.LOGGER.error("Could not read map tag of type {} for registry {}",
+					attachmentType.getId(), registryKey, exception
 				);
 			}
 		}

@@ -32,7 +32,7 @@ public class MapTagManager {
 	@SuppressWarnings("unchecked")
     @Nullable
     public static <R> MapTagKey<R, ?> getMapTag(RegistryKey<? extends Registry<R>> registry, Identifier key) {
-        final var map = MAP_TAGS.get(registry);
+		Map<Identifier, MapTagKey<?, ?>> map = MAP_TAGS.get(registry);
         return map == null ? null : (MapTagKey<R, ?>) map.get(key);
     }
 
@@ -49,8 +49,8 @@ public class MapTagManager {
 				.map(RegistryLoader.Entry::key)
 				.anyMatch(key -> key.equals(registryReference));
 
-            if (type.getNetworkCodec() != null && matchesSynced) throw new UnsupportedOperationException(
-				"Cannot register synced data map " + type.getId()
+            if (type.getPacketCodec() != null && matchesSynced) throw new UnsupportedOperationException(
+				"Cannot register synced map tag " + type.getId()
 				+ " for datapack registry " + registryReference.getValue()
 				+ " that is not synced!"
 			);
@@ -59,7 +59,7 @@ public class MapTagManager {
 		Map<Identifier, MapTagKey<?, ?>> values = getOrCreate(registryReference);
         if (values.containsKey(type.getId())) {
             throw new IllegalArgumentException(
-				"Tried to register data map type with ID " + type.getId()
+				"Tried to register map tag type with ID " + type.getId()
 				+ " to registry " + registryReference.getValue()
 				+ " twice"
 			);

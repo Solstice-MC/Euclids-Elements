@@ -6,13 +6,7 @@
 package org.solstice.euclidsElements.tag.content.network.packets;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.codec.EncoderException;
+import io.netty.buffer.ByteBuf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -29,7 +23,6 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.SimpleRegistry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.function.TriConsumer;
 import org.solstice.euclidsElements.EuclidsElements;
@@ -51,9 +44,6 @@ public record RegistryMapTagSyncPacket<T> (
     );
 
 	@Environment(EnvType.CLIENT)
-    private static final Gson GSON = new Gson();
-
-	@Environment(EnvType.CLIENT)
     @Override
     public Id<RegistryMapTagSyncPacket<?>> getId() {
         return ID;
@@ -61,63 +51,65 @@ public record RegistryMapTagSyncPacket<T> (
 
 	@Environment(EnvType.CLIENT)
     public static final PacketCodec<RegistryByteBuf, RegistryMapTagSyncPacket<?>> PACKET_CODEC = PacketCodec.of(
-            RegistryMapTagSyncPacket::write, RegistryMapTagSyncPacket::decode);
+            RegistryMapTagSyncPacket::encode, RegistryMapTagSyncPacket::decode
+	);
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	public void write(RegistryByteBuf buf) {
-		buf.writeRegistryKey(registryKey);
-		writeMap(buf, mapTags, PacketByteBuf::writeIdentifier, (packetBuf, key, attach) -> {
-			final MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registryKey, key);
+	@Environment(EnvType.CLIENT)
+	@SuppressWarnings("unchecked")
+	public void encode(RegistryByteBuf registryBuf) {
+		registryBuf.writeRegistryKey(this.registryKey);
+		writeMap(registryBuf, this.mapTags, PacketByteBuf::writeIdentifier, (packetBuf, id, mapTags) -> {
+			MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registryKey, id);
 			if (mapTag == null) return;
-			packetBuf.writeMap(attach, PacketByteBuf::writeRegistryKey, (registryBuf, value) -> writeJsonWithRegistryCodec(
-				(RegistryByteBuf) registryBuf,
-				(Codec) mapTag.getNetworkCodec(),
-				value
-			));
+
+			PacketCodec<ByteBuf, T> codec = (PacketCodec<ByteBuf, T>) mapTag.getPacketCodec();
+			packetBuf.writeMap(mapTags, PacketByteBuf::writeRegistryKey, (buf, value) -> codec.encode(buf, (T) value));
 		});
 	}
 
+	@Environment(EnvType.CLIENT)
 	@SuppressWarnings("unchecked")
-    public static <T> RegistryMapTagSyncPacket<T> decode(RegistryByteBuf buf) {
-		// noinspection RedundantCast
-        final RegistryKey<Registry<T>> registryKey = (RegistryKey<Registry<T>>) (Object) buf.readRegistryRefKey();
+    public static <T> RegistryMapTagSyncPacket<T> decode(RegistryByteBuf registryBuf) {
+		RegistryKey<Registry<T>> registryReference = (RegistryKey<Registry<T>>) registryBuf.<T>readRegistryRefKey(); // noinspection RedundantCast
 
-		final Map<Identifier, Map<RegistryKey<T>, ?>> attach = readMap(buf, PacketByteBuf::readIdentifier, (b1, key) -> {
-            final MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registryKey, key);
-            return b1.readMap(bf -> bf.readRegistryKey(registryKey), bf -> readJsonWithRegistryCodec((RegistryByteBuf) bf, mapTag.getNetworkCodec()));
+		Map<Identifier, Map<RegistryKey<T>, ?>> mapTags = readMap(registryBuf, PacketByteBuf::readIdentifier, (packetBuf, id) -> {
+            MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registryReference, id);
+			if (mapTag == null) return Map.of();
+
+			PacketCodec<ByteBuf, T> codec = (PacketCodec<ByteBuf, T>) mapTag.getPacketCodec();
+            return packetBuf.readMap(buf -> buf.readRegistryKey(registryReference), codec);
         });
-        return new RegistryMapTagSyncPacket<>(registryKey, attach);
-    }
-
-    private static <T> T readJsonWithRegistryCodec(RegistryByteBuf buf, Codec<T> codec) {
-        JsonElement jsonelement = JsonHelper.deserialize(GSON, buf.readString(), JsonElement.class);
-        DataResult<T> dataresult = codec.parse(buf.getRegistryManager().getOps(JsonOps.INSTANCE), jsonelement);
-        return dataresult.getOrThrow(name -> new DecoderException("Failed to decode json: " + name));
-    }
-
-    private static <T> void writeJsonWithRegistryCodec(RegistryByteBuf buf, Codec<T> codec, T value) {
-        DataResult<JsonElement> dataresult = codec.encodeStart(buf.getRegistryManager().getOps(JsonOps.INSTANCE), value);
-        buf.writeString(GSON.toJson(dataresult.getOrThrow(message -> new EncoderException("Failed to encode: " + message + " " + value))));
+        return new RegistryMapTagSyncPacket<>(registryReference, mapTags);
     }
 
 	@Environment(EnvType.CLIENT)
-    public static <K, V> Map<K, V> readMap(PacketByteBuf friendlyByteBuf, PacketDecoder<? super PacketByteBuf, K> keyReader, BiFunction<PacketByteBuf, K, V> valueReader) {
-        final int size = friendlyByteBuf.readVarInt();
-        final Map<K, V> map = Maps.newHashMapWithExpectedSize(size);
+    public static <K, V> Map<K, V> readMap(
+		PacketByteBuf buf,
+		PacketDecoder<? super PacketByteBuf, K> keyReader,
+		BiFunction<PacketByteBuf, K, V> valueReader
+	) {
+		int size = buf.readVarInt();
+        Map<K, V> map = Maps.newHashMapWithExpectedSize(size);
 
         for (int i = 0; i < size; ++i) {
-            final K k = keyReader.decode(friendlyByteBuf);
-            map.put(k, valueReader.apply(friendlyByteBuf, k));
+            K key = keyReader.decode(buf);
+            map.put(key, valueReader.apply(buf, key));
         }
 
         return map;
     }
 
-    public static <K, V> void writeMap(PacketByteBuf friendlyByteBuf, Map<K, V> map, PacketEncoder<? super PacketByteBuf, K> keyWriter, TriConsumer<PacketByteBuf, K, V> valueWriter) {
-        friendlyByteBuf.writeVarInt(map.size());
+	@Environment(EnvType.CLIENT)
+    public static <K, V> void writeMap(
+		PacketByteBuf buf,
+		Map<K, V> map,
+		PacketEncoder<? super PacketByteBuf, K> keyWriter,
+		TriConsumer<PacketByteBuf, K, V> valueWriter
+	) {
+        buf.writeVarInt(map.size());
         map.forEach((key, value) -> {
-            keyWriter.encode(friendlyByteBuf, key);
-            valueWriter.accept(friendlyByteBuf, key, value);
+            keyWriter.encode(buf, key);
+            valueWriter.accept(buf, key, value);
         });
     }
 
@@ -129,19 +121,17 @@ public record RegistryMapTagSyncPacket<T> (
 				if (world == null) return;
 
 				DynamicRegistryManager registryManager = world.getRegistryManager();
-				final SimpleRegistry<R> registry = (SimpleRegistry<R>) registryManager.get(payload.registryKey());
+				SimpleRegistry<R> registry = (SimpleRegistry<R>) registryManager.get(payload.registryKey());
 				registry.getMapTags().clear();
 				payload.mapTags.forEach((id, maps) -> {
 					MapTagKey<R, ?> mapTag = MapTagManager.getMapTag(payload.registryKey(), id);
-					var values = Collections.unmodifiableMap(maps);
+					Map<RegistryKey<R>, ?> values = Collections.unmodifiableMap(maps);
 					registry.getMapTags().put(mapTag, values);
 				});
-				System.out.println(registry.getMapTags());
 				MapTagsUpdatedCallback.EVENT.invoker().onMapTagsUpdated(registryManager, registry, MapTagsUpdatedCallback.Cause.CLIENT_SYNC);
 			} catch (Exception exception) {
-				EuclidsElements.LOGGER.error("Failed to handle registry data map sync: ", exception);
-//				context.responseSender().disconnect(Text.literal("neoforge.network.map_tags.failed", payload.registryKey().getValue().toString(), exception.toString()));
-				context.responseSender().disconnect(Text.literal("Failed to handle registry data map sync"));
+				EuclidsElements.LOGGER.error("Failed to handle registry map tag sync: ", exception);
+				context.responseSender().disconnect(Text.literal("Failed to handle registry map tag sync"));
 			}
 		});
 	}

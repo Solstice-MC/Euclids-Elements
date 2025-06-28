@@ -1,6 +1,9 @@
 package org.solstice.euclidsElements.tag.api;
 
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.text.Text;
@@ -11,7 +14,7 @@ public class MapTagKey<T, R> {
 
 	protected final RegistryKey<Registry<T>> registryReference;
 	protected final Codec<R> codec;
-	protected final Codec<R> networkCodec;
+	protected final PacketCodec<ByteBuf, R> packetCodec;
 	protected final Identifier id;
 
 	public RegistryKey<Registry<T>> getRegistryReference() {
@@ -22,8 +25,8 @@ public class MapTagKey<T, R> {
 		return codec;
 	}
 
-	public Codec<R> getNetworkCodec() {
-		return networkCodec;
+	public PacketCodec<ByteBuf, R> getPacketCodec() {
+		return packetCodec;
 	}
 
 	public Identifier getId() {
@@ -33,12 +36,12 @@ public class MapTagKey<T, R> {
 	protected MapTagKey(
 		RegistryKey<Registry<T>> registry,
 		Codec<R> codec,
-		Codec<R> networkCodec,
+		PacketCodec<ByteBuf, R> packetCodec,
 		Identifier id
 	) {
 		this.registryReference = registry;
 		this.codec = codec;
-		this.networkCodec = networkCodec;
+		this.packetCodec = packetCodec;
 		this.id = id;
 	}
 
@@ -47,16 +50,16 @@ public class MapTagKey<T, R> {
 		Codec<R> codec,
 		Identifier id
 	) {
-		return MapTagKey.of(registryReference, codec, codec, id);
+		return MapTagKey.of(registryReference, codec, PacketCodecs.unlimitedCodec(codec), id);
 	}
 
 	public static <T, R> MapTagKey<T, R> of(
 		RegistryKey<Registry<T>> registryReference,
 		Codec<R> codec,
-		Codec<R> networkCodec,
+		PacketCodec<ByteBuf, R> packetCodec,
 		Identifier id
 	) {
-		MapTagKey<T, R> key = new MapTagKey<>(registryReference, codec, networkCodec, id);
+		MapTagKey<T, R> key = new MapTagKey<>(registryReference, codec, packetCodec, id);
 		MapTagManager.registerMapTag(key);
 		return key;
 	}
