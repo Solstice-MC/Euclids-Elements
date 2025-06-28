@@ -135,21 +135,17 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 		entries.forEach(data -> {
 			if (data.replace()) result.clear();
 
-			data.entries().forEach((tagEntry, value) -> {
-				tagEntry.getEntries(registry).stream()
-					.map(RegistryEntry::getKey)
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.forEach(key -> result.put(key, value));
-			});
+			data.entries().forEach((tagEntry, value) -> tagEntry.getEntries(registry).stream()
+				.map(RegistryEntry::getKey)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.forEach(key -> result.put(key, value)));
 
-			data.removals().forEach(tagEntry -> {
-				tagEntry.getEntries(registry).stream()
-					.map(RegistryEntry::getKey)
-					.filter(Optional::isPresent)
-					.map(Optional::get)
-					.forEach(result::remove);
-			});
+			data.removals().forEach(tagEntry -> tagEntry.getEntries(registry).stream()
+				.map(RegistryEntry::getKey)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.forEach(result::remove));
 		});
 
 		return result;

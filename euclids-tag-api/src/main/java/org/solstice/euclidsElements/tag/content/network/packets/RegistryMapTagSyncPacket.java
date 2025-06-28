@@ -70,7 +70,7 @@ public record RegistryMapTagSyncPacket<T> (
 	@Environment(EnvType.CLIENT)
 	@SuppressWarnings("unchecked")
     public static <T> RegistryMapTagSyncPacket<T> decode(RegistryByteBuf registryBuf) {
-		RegistryKey<Registry<T>> registryReference = (RegistryKey<Registry<T>>) registryBuf.<T>readRegistryRefKey(); // noinspection RedundantCast
+		RegistryKey<Registry<T>> registryReference = (RegistryKey<Registry<T>>) registryBuf.<T>readRegistryRefKey();
 
 		Map<Identifier, Map<RegistryKey<T>, ?>> mapTags = readMap(registryBuf, PacketByteBuf::readIdentifier, (packetBuf, id) -> {
             MapTagKey<T, ?> mapTag = MapTagManager.getMapTag(registryReference, id);

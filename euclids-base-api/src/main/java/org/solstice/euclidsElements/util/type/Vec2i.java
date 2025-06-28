@@ -13,8 +13,8 @@ public class Vec2i {
 
     public static Vec2i ZERO = new Vec2i(0, 0);
 
-    public int x;
-    public int y;
+    public final int x;
+    public final int y;
 
     public Vec2i(int x, int y) {
         this.x = x;
@@ -40,10 +40,6 @@ public class Vec2i {
 
     public String toString() {
         return MoreObjects.toStringHelper(this).add("x", x).add("y", y).toString();
-    }
-
-    public String toShortString() {
-        return x + ", " + y;
     }
 
 }
