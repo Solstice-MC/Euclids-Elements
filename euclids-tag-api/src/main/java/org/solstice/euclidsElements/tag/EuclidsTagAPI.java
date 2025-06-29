@@ -12,7 +12,6 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.resource.ResourceType;
-import net.minecraft.server.DataPackContents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
@@ -25,21 +24,15 @@ import org.solstice.euclidsElements.tag.content.network.packets.RegistryMapTagSy
 import org.solstice.euclidsElements.tag.content.network.task.RegistryMapTagTask;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class EuclidsTagAPI implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		AtomicReference<MapTagLoader<?, ?>> loaderReference = new AtomicReference<>();
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(MapTagLoader.ID, registries -> {
-			MapTagLoader<?, ?> loader = new MapTagLoader<>(((DataPackContents.ConfigurableWrapperLookup)registries).dynamicRegistryManager);
-			loaderReference.set(loader);
+			MapTagLoader<?, ?> loader = new MapTagLoader<>(registries);
+			CommonLifecycleEvents.TAGS_LOADED.register(loader::apply);
 			return loader;
-		});
-		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) -> {
-			if (client) return;
-			loaderReference.get().apply();
 		});
 
 		ServerConfigurationConnectionEvents.CONFIGURE.register(RegistryMapTagTask::register);
@@ -61,7 +54,7 @@ public class EuclidsTagAPI implements ModInitializer {
 
 			if (registry.isEmpty()) return;
 			if (!ServerPlayNetworking.canSend(player, RegistryMapTagSyncPacket.ID)) return;
-//			if (player.networkHandler.connection.isLocal()) return;
+			if (player.networkHandler.connection.isLocal()) return;
 
 			Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> playerMaps = player.networkHandler.connection.channel.attr(KnownRegistryMapTagsReplyPacket.KNOWN_MAP_TAGS).get();
 			if (playerMaps == null) return;

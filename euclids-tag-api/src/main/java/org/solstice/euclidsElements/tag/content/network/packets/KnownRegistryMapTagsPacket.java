@@ -6,9 +6,6 @@
 package org.solstice.euclidsElements.tag.content.network.packets;
 
 import com.google.common.collect.Maps;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -17,7 +14,6 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import org.solstice.euclidsElements.EuclidsElements;
-import org.solstice.euclidsElements.tag.content.mapTag.MapTagManager;
 
 import java.util.*;
 
@@ -42,15 +38,5 @@ public record KnownRegistryMapTagsPacket(
 		KnownRegistryMapTagsPacket::mapTags,
 		KnownRegistryMapTagsPacket::new
 	);
-
-	@Environment(EnvType.CLIENT)
-	public static void handle(KnownRegistryMapTagsPacket p, ClientConfigurationNetworking.Context context) {
-		Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> known = new HashMap<>();
-		MapTagManager.getMapTags().forEach((key, vals) ->
-			known.put(key, vals.keySet())
-		);
-
-		context.responseSender().sendPacket(new KnownRegistryMapTagsReplyPacket(known));
-	}
 
 }

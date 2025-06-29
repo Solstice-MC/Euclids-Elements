@@ -31,16 +31,6 @@ allprojects {
 				from components.java
 			}
 		}
-	}
-	tasks.build.finalizedBy publishToMavenLocal
-}
-
-subprojects {
-	base.archivesName = project.name
-	version = module_version
-	group = mod_group
-
-	publishing {
 		repositories {
 			maven {
 				name = "cloudsmith"
@@ -52,6 +42,12 @@ subprojects {
 			}
 		}
 	}
+	tasks.build.finalizedBy publishToMavenLocal
+}
+
+subprojects {
+	base.archivesName = project.name
+	version = version = it.properties.module_version
 }
 
 subprojects.each {

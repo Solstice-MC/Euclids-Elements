@@ -14,7 +14,7 @@ public class MapTagKey<T, R> {
 
 	protected final RegistryKey<Registry<T>> registryReference;
 	protected final Codec<R> codec;
-	protected final PacketCodec<ByteBuf, R> packetCodec;
+	protected final PacketCodec<? extends ByteBuf, R> packetCodec;
 	protected final Identifier id;
 
 	public RegistryKey<Registry<T>> getRegistryReference() {
@@ -25,7 +25,7 @@ public class MapTagKey<T, R> {
 		return codec;
 	}
 
-	public PacketCodec<ByteBuf, R> getPacketCodec() {
+	public PacketCodec<? extends ByteBuf, R> getPacketCodec() {
 		return packetCodec;
 	}
 
@@ -36,7 +36,7 @@ public class MapTagKey<T, R> {
 	protected MapTagKey(
 		RegistryKey<Registry<T>> registry,
 		Codec<R> codec,
-		PacketCodec<ByteBuf, R> packetCodec,
+		PacketCodec<? extends ByteBuf, R> packetCodec,
 		Identifier id
 	) {
 		this.registryReference = registry;
@@ -56,7 +56,7 @@ public class MapTagKey<T, R> {
 	public static <T, R> MapTagKey<T, R> of(
 		RegistryKey<Registry<T>> registryReference,
 		Codec<R> codec,
-		PacketCodec<ByteBuf, R> packetCodec,
+		PacketCodec<? extends ByteBuf, R> packetCodec,
 		Identifier id
 	) {
 		MapTagKey<T, R> key = new MapTagKey<>(registryReference, codec, packetCodec, id);

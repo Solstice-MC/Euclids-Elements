@@ -24,10 +24,6 @@ public record MapTagEntry(Identifier id, boolean tag) {
 			Identifier.validate(entry).map(id -> new MapTagEntry(id, false));
 	}
 
-	public String asString() {
-		return this.tag ? "#" + this.id : this.id.toString();
-	}
-
 	public <T> List<RegistryEntry<T>> getEntries(Registry<T> registry) {
 		List<RegistryEntry<T>> result = new ArrayList<>();
 
@@ -43,6 +39,10 @@ public record MapTagEntry(Identifier id, boolean tag) {
 		}
 
 		return result;
+	}
+
+	public String asString() {
+		return this.tag ? "#" + this.id : this.id.toString();
 	}
 
 	@Override

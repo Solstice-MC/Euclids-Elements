@@ -30,11 +30,11 @@ public class MapTagManager {
 	}
 
 	@SuppressWarnings("unchecked")
-    @Nullable
-    public static <R> MapTagKey<R, ?> getMapTag(RegistryKey<? extends Registry<R>> registry, Identifier key) {
+	@Nullable
+	public static <T, R> MapTagKey<T, R> getMapTag(RegistryKey<? extends Registry<T>> registry, Identifier key) {
 		Map<Identifier, MapTagKey<?, ?>> map = MAP_TAGS.get(registry);
-        return map == null ? null : (MapTagKey<R, ?>) map.get(key);
-    }
+		return map == null ? null : (MapTagKey<T, R>) map.get(key);
+	}
 
     public static <T, R> void registerMapTag(MapTagKey<T, R> type) {
 

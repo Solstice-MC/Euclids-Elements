@@ -4,25 +4,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.registry.*;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.resource.ResourceReloader;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.tag.api.MapTagKey;
 import org.solstice.euclidsElements.tag.api.MapTagsUpdatedCallback;
 
 import java.io.Reader;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
-public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourceReloadListener {
+public class MapTagLoader<T, R> implements SimpleSynchronousResourceReloadListener {
 
 	public static final Identifier ID = EuclidsElements.of("map_tags");
 	public static final String PATH = "map_tags";
@@ -32,12 +28,11 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 		return ID;
 	}
 
-	private final DynamicRegistryManager registryManager;
+	private final RegistryWrapper.WrapperLookup registryLookup;
+	private final Map<RegistryKey<? extends Registry<T>>, LoadedMapTag<T, R>> loadedMapTags = new HashMap<>();
 
-	private final Map<RegistryKey<? extends Registry<T>>, LoadResult<T, R>> results = new HashMap<>();
-
-	public MapTagLoader(DynamicRegistryManager registryManager) {
-		this.registryManager = registryManager;
+	public MapTagLoader(RegistryWrapper.WrapperLookup registryLookup) {
+		this.registryLookup = registryLookup;
 	}
 
 	public static String getDirectory(Identifier id) {
@@ -46,89 +41,86 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 	}
 
 	@Override
-	public CompletableFuture<Void> reload(Synchronizer synchronizer, ResourceManager manager, Profiler prepareProfiler, Profiler applyProfiler, Executor prepareExecutor, Executor applyExecutor) {
-		return this.prepareReload(manager, prepareExecutor)
-			.thenCompose(synchronizer::whenPrepared)
-			.thenAcceptAsync(this.results::putAll, applyExecutor);
-	}
-
-	private CompletableFuture<Map<RegistryKey<? extends Registry<T>>, LoadResult<T,  R>>> prepareReload(ResourceManager manager, Executor executor) {
-		return CompletableFuture.supplyAsync(() -> prepareReload(manager, this.registryManager), executor);
+	public void reload(ResourceManager resourceManager) {
+		this.loadedMapTags.putAll(this.loadMapTags(resourceManager, this.registryLookup));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T, R> Map<RegistryKey<? extends Registry<T>>, LoadResult<T, R>> prepareReload(ResourceManager manager, DynamicRegistryManager registryManager) {
-		RegistryOps<JsonElement> ops = RegistryOps.of(JsonOps.INSTANCE, registryManager);
-		Map<RegistryKey<? extends Registry<T>>, LoadResult<T, R>> values = new HashMap<>();
+	private Map<RegistryKey<? extends Registry<T>>, LoadedMapTag<T, R>> loadMapTags(ResourceManager manager, RegistryWrapper.WrapperLookup registryLookup) {
+		RegistryOps<JsonElement> ops = RegistryOps.of(JsonOps.INSTANCE, registryLookup);
+		Map<RegistryKey<? extends Registry<T>>, LoadedMapTag<T, R>> result = new HashMap<>();
 
-		registryManager.streamAllRegistries().forEach( registryEntry -> {
-			RegistryKey<Registry<T>> registryKey = (RegistryKey<Registry<T>>) registryEntry.key();
-
-			ResourceFinder finder = ResourceFinder.json(PATH + "/" + getDirectory(registryKey.getValue()));
+		registryLookup.streamAllRegistryKeys().forEach( rawReference -> {
+			RegistryKey<Registry<T>> registryReference = (RegistryKey<Registry<T>>) rawReference;
+			ResourceFinder finder = ResourceFinder.json(PATH + "/" + getDirectory(registryReference.getValue()));
 			finder.findAllResources(manager).forEach((key, resources) -> {
-				Identifier attachmentId = finder.toResourceId(key);
-				MapTagKey<T, R> attachment = (MapTagKey<T, R>) MapTagManager.getMapTag(registryKey, attachmentId);
-				if (attachment == null) {
+				Identifier id = finder.toResourceId(key);
+				MapTagKey<T, R> mapTag = MapTagManager.getMapTag(registryReference, id);
+				if (mapTag == null) {
 					EuclidsElements.LOGGER.warn("Found map tag file for non-existent map tag type '{}' on registry '{}'",
-						attachmentId, registryKey.getValue()
+						id, registryReference.getValue()
 					);
 					return;
 				}
 
-				LoadResult<T, R> result = values.computeIfAbsent(
-					registryKey,
-					k -> new LoadResult<>(new HashMap<>())
+				LoadedMapTag<T, R> loadedMapTag = result.computeIfAbsent(
+					registryReference,
+					k -> new LoadedMapTag<>(new HashMap<>())
 				);
-				result.contents.put(attachment, readData(ops, attachment, registryKey, resources));
+				loadedMapTag.files.put(mapTag, this.readFromFile(ops, mapTag, registryReference, resources));
 
 			});
-
 		});
 
-		return values;
+		return result;
 	}
 
-	public void apply() {
-		this.results.forEach((key, result) ->
-			this.apply((SimpleRegistry<T>) registryManager.get(key), result)
-		);
-		this.results.clear();
-	}
-
-	private void apply(SimpleRegistry<T> registry, LoadResult<T, R> result) {
-		registry.getMapTags().clear();
-
-		result.contents.forEach((key, entries) ->
-			registry.getMapTags().put(key, this.buildMapTag(registry, entries))
-		);
-
-		MapTagsUpdatedCallback.EVENT.invoker().onMapTagsUpdated(registryManager, registry, MapTagsUpdatedCallback.Cause.SERVER_RELOAD);
-	}
-	private static <T, R> List<MapTagData<R>> readData(
+	private List<MapTagFile<R>> readFromFile(
 		RegistryOps<JsonElement> ops,
-		MapTagKey<T, R> attachmentType,
-		RegistryKey<Registry<T>> registryKey,
+		MapTagKey<T, R> mapTag,
+		RegistryKey<Registry<T>> registryReference,
 		List<Resource> resources
 	) {
-		Codec<MapTagData<R>> codec = MapTagData.codec(attachmentType);
-		List<MapTagData<R>> entries = new LinkedList<>();
+		Codec<MapTagFile<R>> codec = MapTagFile.codec(mapTag);
+		List<MapTagFile<R>> entries = new LinkedList<>();
 		for (Resource resource : resources) {
 			try (Reader reader = resource.getReader()) {
 				JsonElement element = JsonParser.parseReader(reader);
-				MapTagData<R> data = codec.decode(ops, element).getOrThrow().getFirst();
+				MapTagFile<R> data = codec.decode(ops, element).getOrThrow().getFirst();
 				entries.add(data);
 			} catch (Exception exception) {
 				EuclidsElements.LOGGER.error("Could not read map tag of type {} for registry {}",
-					attachmentType.getId(), registryKey, exception
+					mapTag.getId(), registryReference, exception
 				);
 			}
 		}
 		return entries;
 	}
 
-	private Map<RegistryKey<T>, R> buildMapTag(
+	public record LoadedMapTag<T, R>(Map<MapTagKey<T, R>, List<MapTagFile<R>>> files) {}
+
+	public void apply(DynamicRegistryManager registryManager, boolean client) {
+		if (client) return;
+		this.loadedMapTags.forEach((registryReference, loadedMapTag) ->
+			this.applyMapTags(registryManager, registryReference, loadedMapTag)
+		);
+		this.loadedMapTags.clear();
+	}
+
+	private void applyMapTags(DynamicRegistryManager registryManager, RegistryKey<? extends Registry<T>> registryReference, LoadedMapTag<T, R> loadedMapTag) {
+		Registry<T> registry = registryManager.get(registryReference);
+		registry.getMapTags().clear();
+
+		loadedMapTag.files.forEach((MapTagKey<T, R> mapTag, List<MapTagFile<R>> entries) ->
+			registry.getMapTags().put(mapTag, this.getMapTagData(registry, entries))
+		);
+
+		MapTagsUpdatedCallback.EVENT.invoker().onMapTagsUpdated(registryManager, registry, MapTagsUpdatedCallback.Cause.SERVER_RELOAD);
+	}
+
+	private Map<RegistryKey<T>, R> getMapTagData(
 		Registry<T> registry,
-		List<MapTagData<R>> entries
+		List<MapTagFile<R>> entries
 	) {
 		Map<RegistryKey<T>, R> result = new HashMap<>();
 
@@ -150,7 +142,5 @@ public class MapTagLoader<T, R> implements ResourceReloader, IdentifiableResourc
 
 		return result;
 	}
-
-	public record LoadResult<T, R>(Map<MapTagKey<T, R>, List<MapTagData<R>>> contents) {}
 
 }

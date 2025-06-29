@@ -26,13 +26,13 @@ public record KnownRegistryMapTagsReplyPacket (
         Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>> mapTags
 ) implements CustomPayload {
 
-	public static final AttributeKey<Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>>> KNOWN_MAP_TAGS =
-		AttributeKey.valueOf(EuclidsElements.of("known_map_tags").toString()
-	);
-
     public static final Id<KnownRegistryMapTagsReplyPacket> ID = new Id<>(
         EuclidsElements.of("known_registry_map_tags_reply")
     );
+
+	public static final AttributeKey<Map<RegistryKey<? extends Registry<?>>, Collection<Identifier>>> KNOWN_MAP_TAGS =
+		AttributeKey.valueOf(EuclidsElements.of("known_map_tags").toString()
+	);
 
     @Override
     public Id<KnownRegistryMapTagsReplyPacket> getId() {
