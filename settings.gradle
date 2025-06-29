@@ -1,10 +1,26 @@
 pluginManagement {
     repositories {
-        maven { url "https://maven.fabricmc.net/" }
-        maven { url "https://maven.architectury.dev/" }
-        maven { url "https://files.minecraftforge.net/maven/" }
+        maven { url = "https://maven.fabricmc.net/" }
         gradlePluginPortal()
-    }
+		mavenCentral()
+	}
 }
 
-rootProject.name = "Euclids-Elements"
+rootProject.name = "Euclid's Elements"
+
+include (
+	'euclids-base-api',
+	'euclids-content',
+
+	'euclids-tag-api',
+	'euclids-effect-holder-api',
+	'euclids-component-holder-api',
+	'euclids-advancement-api',
+	'euclids-auto-datagen-api',
+	'euclids-splash-text-api',
+	'euclids-construct-api',
+
+//	'euclids-enchantment-tooltips'
+//	'euclids-audio-api',
+//	'euclids-recipe-book-api',
+)

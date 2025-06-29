@@ -1,0 +1,16 @@
+{
+	"block.sacred_heart.heartbeat": {
+		"sounds": [
+			"tabula:block/sacred_heart/heartbeat.opus"
+		],
+		"subtitle": "subtitle.block.sacred_heart.heartbeat"
+	},
+	"music_disc.scarico_in_vinile": {
+		"sounds": [
+			{
+				"name": "tabula:records/scarico_in_vinile.opus",
+				"stream": true
+			}
+		]
+	}
+}

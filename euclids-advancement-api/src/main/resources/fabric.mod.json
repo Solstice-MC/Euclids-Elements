@@ -1,0 +1,15 @@
+{
+    "schemaVersion": 1,
+    "id": "euclids-advancement-api",
+    "version": "${module_version}",
+
+    "name": "Euclid's Advancement API",
+    "authors": [ "Solstice" ],
+
+	"mixins": ["euclids-advancement-api.mixins.json"],
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/advancement/Advancement\u0024Builder": [ "org/solstice/euclidsElements/advancement/api/EuclidsAdvancementBuilder" ]
+		}
+	}
+}

@@ -1,0 +1,48 @@
+{
+	"enchantment_effect.minecraft.prevent_armor_change": "W.I.P.",
+	"enchantment_effect.minecraft.damage_protection": "W.I.P.",
+	"enchantment_effect.minecraft.attributes": "W.I.P.",
+	"enchantment_effect.minecraft.armor_effectiveness": "W.I.P.",
+	"enchantment_effect.minecraft.hit_block": "W.I.P.",
+	"enchantment_effect.minecraft.smash_damage_per_fallen_block": "W.I.P.",
+	"enchantment_effect.minecraft.projectile_spawned": "W.I.P.",
+	"enchantment_effect.minecraft.damage_immunity": "W.I.P.",
+	"enchantment_effect.minecraft.location_changed": "W.I.P.",
+	"enchantment_effect.minecraft.ammo_use": "W.I.P.",
+	"enchantment_effect.minecraft.knockback": "W.I.P.",
+	"enchantment_effect.minecraft.equipment_drops": "W.I.P.",
+	"enchantment_effect.minecraft.trident_return_acceleration": "W.I.P.",
+	"enchantment_effect.minecraft.fishing_luck_bonus": "W.I.P.",
+	"enchantment_effect.minecraft.fishing_time_reduction": "W.I.P.",
+	"enchantment_effect.minecraft.repair_with_xp": "W.I.P.",
+	"enchantment_effect.minecraft.projectile_count": "W.I.P.",
+	"enchantment_effect.minecraft.projectile_spread": "W.I.P.",
+	"enchantment_effect.minecraft.projectile_piercing": "W.I.P.",
+	"enchantment_effect.minecraft.crossbow_charge_time": "W.I.P.",
+	"enchantment_effect.minecraft.crossbow_charging_sounds": "W.I.P.",
+	"enchantment_effect.minecraft.trident_sound": "W.I.P.",
+	"enchantment_effect.minecraft.trident_spin_attack_strength": "W.I.P.",
+	"enchantment_effect.minecraft.block_experience": "W.I.P.",
+	"enchantment_effect.minecraft.tick": "W.I.P.",
+	"enchantment_effect.minecraft.item_damage": "W.I.P.",
+	"enchantment_effect.minecraft.prevent_equipment_drop": "W.I.P.",
+
+
+	"enchantment_effect.minecraft.damage": "Deals %s damage",
+
+	"enchantment_entity_effect.minecraft.apply_mob_effect": "Applies %s",
+
+	"loot_condition.minecraft.entity_properties": "to %s",
+
+	"tag.entity_type.minecraft.sensitive_to_bane_of_arthropods": "Arthropods",
+	"tag.entity_type.minecraft.sensitive_to_smite": "the Undead",
+	"tag.entity_type.minecraft.sensitive_to_impaling": "the Aquatic",
+
+	"target.attacker": "Attacker",
+	"target.victim": "Victim",
+
+	"enchantment_value_effect.minecraft.add": "%s more",
+	"enchantment_value_effect.minecraft.multiply": "%s times more",
+	"enchantment_value_effect.minecraft.remove_binomial": "%s less",
+	"enchantment_value_effect.minecraft.set": "%s"
+}

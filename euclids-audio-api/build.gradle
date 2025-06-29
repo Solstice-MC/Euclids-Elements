@@ -1,0 +1,11 @@
+repositories {
+	maven { url = 'https://maven.maxhenkel.de/repository/public' }
+}
+
+dependencies {
+	include implementation('org.concentus:Concentus:1.0-SNAPSHOT')
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/euclids-audio-api.accesswidener")
+}

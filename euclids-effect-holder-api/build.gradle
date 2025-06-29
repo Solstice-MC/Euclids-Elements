@@ -1,0 +1,8 @@
+moduleDependencies(project, [
+	'euclids-base-api',
+	'euclids-component-holder-api',
+])
+
+loom {
+	accessWidenerPath = file("src/main/resources/euclids-effect-holder-api.accesswidener")
+}

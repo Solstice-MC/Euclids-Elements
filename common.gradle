@@ -1,0 +1,59 @@
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'maven-publish'
+	apply plugin: 'fabric-loom'
+
+	base.archivesName = mod_id
+	version = module_version
+	group = mod_group
+
+	dependencies {
+		minecraft "com.mojang:minecraft:${minecraft_version}"
+		mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+		modImplementation "net.fabricmc:fabric-loader:${loader_version}"
+		modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+	}
+
+	java {
+		withSourcesJar()
+	}
+
+	tasks.withType(ProcessResources).configureEach {
+		duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+		filesMatching("fabric.mod.json") {
+			expand project.properties
+		}
+	}
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				from components.java
+			}
+		}
+	}
+	tasks.build.finalizedBy publishToMavenLocal
+}
+
+subprojects {
+	base.archivesName = project.name
+	version = module_version
+	group = mod_group
+
+	publishing {
+		repositories {
+			maven {
+				name = "cloudsmith"
+				url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
+				credentials {
+					username = System.getenv('CLOUDSMITH_USERNAME')
+					password = System.getenv('CLOUDSMITH_API_KEY')
+				}
+			}
+		}
+	}
+}
+
+subprojects.each {
+	remapJar.dependsOn("${it.path}:remapJar")
+}

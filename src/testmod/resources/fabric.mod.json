@@ -1,0 +1,13 @@
+{
+	"schemaVersion": 1,
+	"id": "tabula",
+	"version": "3.2.3",
+
+	"name": "Tabula",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [ "org.solstice.tabula.Tabula" ],
+		"fabric-datagen": [ "org.solstice.tabula.TabulaDatagen" ]
+	}
+}

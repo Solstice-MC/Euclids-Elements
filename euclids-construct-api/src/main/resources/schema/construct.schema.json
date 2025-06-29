@@ -1,0 +1,72 @@
+{
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"description": "Entity Construction Data",
+	"definitions": {
+		"EntityStack": {
+			"description": "Entity type with NBT data",
+			"properties": {
+				"data": {
+					"type": "object"
+				},
+				"id": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		}
+	},
+	"properties": {
+		"entity": {
+			"$ref": "#/definitions/EntityStack"
+		},
+		"key": {
+			"additionalProperties": {
+				"additionalProperties": {
+					"type": "string"
+				},
+				"type": "object"
+			},
+			"type": "object"
+		},
+		"offset": {
+			"items": {
+				"type": "integer"
+			},
+			"maxItems": 3,
+			"minItems": 3,
+			"type": "array"
+		},
+		"pattern": {
+			"anyOf": [
+				{
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				{
+					"items": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"type": "array"
+				},
+				{
+					"type": "string"
+				}
+			]
+		}
+	},
+	"required": [
+		"pattern",
+		"key",
+		"offset",
+		"entity"
+	],
+	"type": "object"
+}

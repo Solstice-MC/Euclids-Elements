@@ -1,0 +1,17 @@
+{
+	"pattern": [
+		"^",
+		"#",
+		"#"
+	],
+	"key": {
+		"^": { "tag": "minecraft:golem_head" },
+		"#": { "block": "minecraft:snow_block" }
+	},
+	"offset": [
+		0, 2, 0
+	],
+	"entity": {
+		"id": "minecraft:snow_golem"
+	}
+}

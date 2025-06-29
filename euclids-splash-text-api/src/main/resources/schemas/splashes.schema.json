@@ -1,0 +1,59 @@
+{
+	"$schema": "http://json-schema.org/draft-06/schema#",
+	"definitions": {
+		"AdvancedSplashText": {
+			"description": "Advanced splash text object",
+			"properties": {
+				"date": {
+					"type": "string"
+				},
+				"mod": {
+					"type": "string"
+				},
+				"value": {
+					"anyOf": [
+						{
+							"type": "object"
+						},
+						{
+							"type": "string"
+						}
+					]
+				},
+				"weight": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"value"
+			],
+			"type": "object"
+		}
+	},
+	"description": "Splash text file information",
+	"properties": {
+		"default_style": {
+			"type": "object"
+		},
+		"values": {
+			"items": {
+				"anyOf": [
+					{
+						"$ref": "#/definitions/AdvancedSplashText"
+					},
+					{
+						"type": "object"
+					},
+					{
+						"type": "string"
+					}
+				]
+			},
+			"type": "array"
+		}
+	},
+	"required": [
+		"values"
+	],
+	"type": "object"
+}

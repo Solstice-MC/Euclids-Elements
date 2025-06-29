@@ -1,0 +1,31 @@
+{
+	"pattern": [
+		[
+			"   ",
+			" _ ",
+			"###"
+		],
+		[
+			" ^ ",
+			"_$_",
+			"###"
+		],
+		[
+			"   ",
+			" _ ",
+			"###"
+		]
+	],
+	"key": {
+		"^": { "block": "minecraft:fire" },
+		"_": { "block": "minecraft:redstone_torch" },
+		"$": { "block": "minecraft:gold_block" },
+		"#": { "block": "minecraft:netherrack" }
+	},
+	"offset": [
+		0, 3, 0
+	],
+	"entity": {
+		"id": "minecraft:herobrine"
+	}
+}

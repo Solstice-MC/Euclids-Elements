@@ -1,0 +1,26 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.content.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"ItemStackMixin",
+		"ServerPlayerInteractionManagerMixin",
+		"itemCollapse.PlayerEntityMixin",
+		"stackSize.DataComponentTypesMixin",
+		"stackSize.InventoryMixin",
+		"stackSize.ItemCommandMixin",
+		"stackSize.ItemStackMixin"
+	],
+	"client": [
+		"ClientPlayerInteractionManagerMixin",
+		"MinecraftClientMixin",
+		"customItemModel.ItemModelsMixin",
+		"customItemModel.ItemRendererMixin",
+		"customItemModel.ModelLoaderMixin",
+		"itemCollapse.DrawContextMixin",
+		"posableItem.BipedEntityModelMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

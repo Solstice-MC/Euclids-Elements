@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids_elements",
+	"version": "${mod_version}",
+
+	"name": "Euclid's Elements",
+	"description": "Library for Customizable Content Mods",
+	"authors": [ "Solstice" ],
+	"contact": {
+		"homepage": "https://github.com/Solstace-MC",
+		"sources": "https://github.com/Solstace-MC/Euclids-Elements"
+	},
+	"license": "LGPL-3.0",
+	"icon": "assets/euclids_elements/icon.png",
+
+	"depends": {
+		"minecraft": "*",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"minecraft": "~${minecraft_version}",
+		"fabric-api": "~${fabric_version}"
+	}
+}

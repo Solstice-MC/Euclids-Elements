@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "org.solstice.euclidsElements.advancement.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"AdvancementBuilderMixin",
+		"AdvancementLoaderMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

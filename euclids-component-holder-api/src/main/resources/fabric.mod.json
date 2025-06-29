@@ -1,0 +1,24 @@
+{
+    "schemaVersion": 1,
+    "id": "euclids-component-holder-api",
+    "version": "${module_version}",
+
+    "name": "Euclid's Component Holder API",
+    "authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [ "org.solstice.euclidsElements.componentHolder.EuclidsComponentHolderAPI" ]
+	},
+	"mixins": [
+		"euclids-component-holder-api.mixins.json"
+	],
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/entity/Entity": [ "org/solstice/euclidsElements/componentHolder/api/AdvancedComponentHolder" ]
+		}
+	},
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
+}

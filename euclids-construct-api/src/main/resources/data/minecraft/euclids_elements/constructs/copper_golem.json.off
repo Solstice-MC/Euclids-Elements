@@ -1,0 +1,19 @@
+{
+	"pattern": [
+		"I ",
+		"^ ",
+		"#."
+	],
+	"key": {
+		"^": { "tag": "minecraft:golem_head" },
+		"I": { "block": "minecraft:lightning_rod" },
+		"#": { "block": "minecraft:copper_block" },
+		".": { "block": "minecraft:stone_button" }
+	},
+	"offset": [
+		0, 1, 0
+	],
+	"entity": {
+		"id": "minecraft:iron_golem"
+	}
+}

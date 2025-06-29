@@ -1,0 +1,37 @@
+{
+	"type": "minecraft:crafting",
+	"categories": [
+		{
+			"id": "search",
+			"icons": [
+				"minecraft:compass"
+			]
+		},
+		{
+			"id": "building",
+			"icons": [
+				"minecraft:bricks"
+			]
+		},
+		{
+			"id": "redstone",
+			"icons": [
+				"minecraft:redstone"
+			]
+		},
+		{
+			"id": "equipment",
+			"icons": [
+				"minecraft:iron_axe",
+				"minecraft:golden_sword"
+			]
+		},
+		{
+			"id": "misc",
+			"icons": [
+				"minecraft:lava_bucket",
+				"minecraft:apple"
+			]
+		}
+	]
+}

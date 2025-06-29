@@ -1,0 +1,10 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-base-api",
+	"version": "${module_version}",
+
+	"name": "Euclid's Base API",
+	"authors": [ "Solstice" ],
+
+	"mixins": [ "euclids-base-api.mixins.json" ]
+}

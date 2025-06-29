@@ -1,0 +1,10 @@
+apply plugin: 'fabric-loom'
+
+moduleDependencies(project, [
+	'euclids-base-api',
+	'euclids-effect-holder-api'
+])
+
+loom {
+	accessWidenerPath = file("src/main/resources/euclids-enchantment-tooltips.accesswidener")
+}

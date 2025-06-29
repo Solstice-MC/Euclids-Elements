@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-recipe-book-api",
+	"version": "${module_version}",
+
+	"name": "Euclid's Recipe Book API",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": []
+	},
+	"mixins": [ "euclids-recipe-book-api.mixins.json" ],
+	"accessWidener": "euclids-recipe-book-api.accesswidener",
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/recipe/book/RecipeBook": [ "org/solstice/euclidsElements/recipeBook/api/EuclidsRecipeBook" ],
+			"net/minecraft/recipe/book/RecipeBookOptions": [ "org/solstice/euclidsElements/recipeBook/api/EuclidsRecipeBookOptions" ],
+
+			"net/minecraft/screen/AbstractRecipeScreenHandler": [ "org/solstice/euclidsElements/recipeBook/api/EuclidsAbstractRecipeScreenHandler" ]
+		}
+	},
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
+}

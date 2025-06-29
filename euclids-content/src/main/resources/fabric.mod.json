@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"id": "euclids-content",
+	"version": "${module_version}",
+
+	"name": "Euclid's Content",
+	"authors": [ "Solstice" ],
+
+	"entrypoints": {
+		"main": [ "org.solstice.euclidsElements.content.EuclidsContent" ],
+		"client": [ "org.solstice.euclidsElements.content.EuclidsContentClient" ]
+	},
+	"mixins": [ "euclids-content.mixins.json" ],
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/entity/player/PlayerEntity": [ "org/solstice/euclidsElements/content/api/entity/PlayerItemCollapseManager" ],
+			"net/minecraft/item/ItemStack": [ "org/solstice/euclidsElements/content/api/item/FuelItemStack" ]
+		}
+	},
+
+	"depends": {
+		"euclids-base-api": "*"
+	}
+}
