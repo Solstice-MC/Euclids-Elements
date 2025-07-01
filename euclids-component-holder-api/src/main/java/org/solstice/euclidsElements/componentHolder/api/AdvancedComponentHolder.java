@@ -1,5 +1,7 @@
 package org.solstice.euclidsElements.componentHolder.api;
 
+import net.minecraft.component.ComponentHolder;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.ComponentType;
 import org.jetbrains.annotations.Nullable;
@@ -7,31 +9,39 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
-public interface AdvancedComponentHolder {
+public interface AdvancedComponentHolder extends ComponentHolder {
 
-	default void setComponents(ComponentMapImpl components) {
-	}
-
-	default ComponentMapImpl getComponents() {
+	default ComponentMapImpl getAdvancedComponents() {
 		return null;
 	}
 
+	default void setAdvancedComponents(ComponentMapImpl components) {
+	}
+
+	@Override
+	default ComponentMap getComponents() {
+		return this.getAdvancedComponents();
+	}
+
+	@Override
 	@Nullable
 	default <T> T get(ComponentType<? extends T> type) {
-		return this.getComponents().get(type);
+		return this.getAdvancedComponents().get(type);
 	}
 
+	@Override
 	default <T> T getOrDefault(ComponentType<? extends T> type, T fallback) {
-		return this.getComponents().getOrDefault(type, fallback);
+		return this.getAdvancedComponents().getOrDefault(type, fallback);
 	}
 
+	@Override
 	default boolean contains(ComponentType<?> type) {
-		return this.getComponents().contains(type);
+		return this.getAdvancedComponents().contains(type);
 	}
 
 	@Nullable
 	default <T> T set(ComponentType<? super T> type, @Nullable T value) {
-		return this.getComponents().set(type, value);
+		return this.getAdvancedComponents().set(type, value);
 	}
 
 	@Nullable
@@ -47,7 +57,7 @@ public interface AdvancedComponentHolder {
 
 	@Nullable
 	default <T> T remove(ComponentType<? extends T> type) {
-		return this.getComponents().remove(type);
+		return this.getAdvancedComponents().remove(type);
 	}
 
 }

@@ -52,9 +52,7 @@ public interface EffectHolder {
 
     static <T> void applyEffects(List<EnchantmentEffectEntry<T>> entries, LootContext context, Consumer<T> effectConsumer) {
         entries.forEach(effect -> {
-            if (effect.test(context)) {
-                effectConsumer.accept(effect.effect());
-            }
+            if (effect.test(context)) effectConsumer.accept(effect.effect());
         });
     }
 
@@ -64,63 +62,61 @@ public interface EffectHolder {
 
     default void onTick(ServerWorld world, int level, EnchantmentEffectContext context, Entity user) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.TICK),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> effect.apply(world, level, context, user, user.getPos())
+			this.getEffect(EnchantmentEffectComponentTypes.TICK),
+			Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
+			effect -> effect.apply(world, level, context, user, user.getPos())
         );
     }
 
     default void onProjectileSpawned(ServerWorld world, int level, EnchantmentEffectContext context, Entity user) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.PROJECTILE_SPAWNED),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> effect.apply(world, level, context, user, user.getPos())
+			this.getEffect(EnchantmentEffectComponentTypes.PROJECTILE_SPAWNED),
+			Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
+			effect -> effect.apply(world, level, context, user, user.getPos())
         );
     }
 
     default void onHitBlock(ServerWorld world, int level, EnchantmentEffectContext context, Entity enchantedEntity, Vec3d pos, BlockState state) {
         applyEffects(
-                this.getEffect(EnchantmentEffectComponentTypes.HIT_BLOCK),
-                Enchantment.createHitBlockLootContext(world, level, enchantedEntity, pos, state),
-                effect -> effect.apply(world, level, context, enchantedEntity, pos)
+			this.getEffect(EnchantmentEffectComponentTypes.HIT_BLOCK),
+			Enchantment.createHitBlockLootContext(world, level, enchantedEntity, pos, state),
+			effect -> effect.apply(world, level, context, enchantedEntity, pos)
         );
     }
 
     default void modifyValue(ComponentType<EnchantmentValueEffect> type, Random random, int level, MutableFloat value) {
         EnchantmentValueEffect effect = this.getEffects().get(type);
-        if (effect != null) {
-            value.setValue(effect.apply(level, random, value.floatValue()));
-        }
+        if (effect != null) value.setValue(effect.apply(level, random, value.floatValue()));
     }
 
     default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, MutableFloat value) {
         applyEffects(
-                this.getEffect(type),
-                Enchantment.createEnchantedItemLootContext(world, level, stack),
-                effect -> value.setValue(effect.apply(level, world.getRandom(), value.getValue()))
+			this.getEffect(type),
+			Enchantment.createEnchantedItemLootContext(world, level, stack),
+			effect -> value.setValue(effect.apply(level, world.getRandom(), value.getValue()))
         );
     }
 
     default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, Entity user, MutableFloat value) {
         applyEffects(
-                this.getEffect(type),
-                Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
-                effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
+			this.getEffect(type),
+			Enchantment.createEnchantedEntityLootContext(world, level, user, user.getPos()),
+			effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
         );
     }
 
     default void modifyValue(ComponentType<List<EnchantmentEffectEntry<EnchantmentValueEffect>>> type, ServerWorld world, int level, ItemStack stack, Entity user, DamageSource damageSource, MutableFloat value) {
         applyEffects(
-                this.getEffect(type),
-                Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource),
-                effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
+			this.getEffect(type),
+			Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource),
+			effect -> value.setValue(effect.apply(level, user.getRandom(), value.floatValue()))
         );
     }
 
     default boolean hasDamageImmunityTo(ServerWorld world, int level, Entity user, DamageSource damageSource) {
         LootContext context = Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource);
 
-        for(EnchantmentEffectEntry<DamageImmunityEnchantmentEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.DAMAGE_IMMUNITY)) {
+        for (EnchantmentEffectEntry<DamageImmunityEnchantmentEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.DAMAGE_IMMUNITY)) {
             if (effect.test(context)) return true;
         }
         return false;
@@ -131,7 +127,7 @@ public interface EffectHolder {
 
         for(EnchantmentEffectEntry<EnchantmentValueEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.DAMAGE_PROTECTION)) {
             if (effect.test(context)) damageProtection.setValue(
-                    effect.effect().apply(level, user.getRandom(), damageProtection.floatValue())
+				effect.effect().apply(level, user.getRandom(), damageProtection.floatValue())
             );
         }
     }
@@ -146,8 +142,7 @@ public interface EffectHolder {
 
     default void onTargetDamaged(ServerWorld world, int level, EnchantmentEffectContext context, EnchantmentEffectTarget target, Entity user, DamageSource damageSource) {
         for (TargetedEnchantmentEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.POST_ATTACK)) {
-            if (target == effect.enchanted())
-                Enchantment.applyTargetedEffect(effect, world, level, context, user, damageSource);
+            if (target == effect.enchanted()) Enchantment.applyTargetedEffect(effect, world, level, context, user, damageSource);
         }
     }
 
@@ -253,11 +248,11 @@ public interface EffectHolder {
         }
     }
 
-
     /**
-     * Defines the common properties of an effect holder
+     * Defines the common properties of an effect holder.
      */
     interface Definition {
+
         /**
          * Gets the maximum level this effect holder can have.
          *
@@ -271,6 +266,7 @@ public interface EffectHolder {
          * @return The list of applicable equipment slots
          */
         List<AttributeModifierSlot> getSlots();
+
     }
 
 }

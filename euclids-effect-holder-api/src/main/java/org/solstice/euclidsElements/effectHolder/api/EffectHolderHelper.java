@@ -1,5 +1,6 @@
 package org.solstice.euclidsElements.effectHolder.api;
 
+import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentType;
 import net.minecraft.enchantment.EnchantmentEffectContext;
 import net.minecraft.entity.EquipmentSlot;
@@ -16,8 +17,9 @@ import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.effectHolder.api.component.EffectHolderComponent;
 import org.solstice.euclidsElements.util.RegistryHelper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public abstract class EffectHolderHelper {
 
@@ -44,12 +46,10 @@ public abstract class EffectHolderHelper {
 	@SuppressWarnings("unchecked")
 	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, Consumer<T> consumer) {
 		EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
-			EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
-			if (component == null) return;
-
-			component.getEffects().forEach((entry, level) -> {
-				consumer.accept((RegistryEntry<T>) entry, level);
-			});
+			List<EffectHolderComponent<T>> components = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack);
+			components.stream()
+				.map(EffectHolderComponent::getEffects)
+				.forEach(effects -> effects.forEach(consumer::accept));
 		});
     }
 
@@ -57,24 +57,40 @@ public abstract class EffectHolderHelper {
 	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, LivingEntity entity, ContextAwareConsumer<T> consumer) {
 		if (stack.isEmpty()) return;
 
+		EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
 		EFFECT_HOLDER_COMPONENTS.forEach(componentType -> {
-			EffectHolderComponent<?> component = stack.getOrDefault(componentType, null);
-			if (component == null) return;
-
-			EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
-			component.getEffects().forEach((entry, level) -> {
-				if (entry.value().slotMatches(slot)) {
-					consumer.accept((RegistryEntry<T>) entry, level, context);
-				}
-			});
+			List<EffectHolderComponent<T>> components = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack, entity);
+			components.stream()
+				.map(EffectHolderComponent::getEffects)
+				.forEach(effects ->
+					effects.forEach((entry, level) -> {
+						if (entry.value().slotMatches(slot)) consumer.accept(entry, level, context);
+					})
+				);
 		});
-    }
+	}
 
     public static void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer<?> consumer) {
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             forEachEffectHolder(entity.getEquippedStack(slot), slot, entity, consumer);
         }
     }
+
+	@SafeVarargs
+	public static <T extends EffectHolder, R extends ComponentHolder> List<EffectHolderComponent<T>> getComponents(
+		ComponentType<EffectHolderComponent<T>> componentType,
+		R... componentHolders
+	) {
+		return getComponents(componentType, Arrays.stream(componentHolders).toList());
+	}
+
+	public static <T extends EffectHolder, R extends ComponentHolder> List<EffectHolderComponent<T>> getComponents(
+		ComponentType<EffectHolderComponent<T>> componentType,
+		List<R> componentHolders
+	) {
+		Function<R, EffectHolderComponent<T>> getOrDefault = value -> value.getOrDefault(componentType, null);
+		return componentHolders.stream().map(getOrDefault).filter(Objects::nonNull).toList();
+	}
 
 	public static int getMaxDurability(ItemStack stack, int base) {
 		MutableFloat result = new MutableFloat(base);

@@ -38,12 +38,12 @@ public class EntityMixin implements AdvancedComponentHolder {
 	}
 
 	@Override
-	public ComponentMapImpl getComponents() {
+	public ComponentMapImpl getAdvancedComponents() {
 		return this.dataTracker.get(TRACKED_COMPONENTS);
 	}
 
 	@Override
-	public void setComponents(ComponentMapImpl components) {
+	public void setAdvancedComponents(ComponentMapImpl components) {
 		this.dataTracker.set(TRACKED_COMPONENTS, components);
 	}
 
@@ -58,7 +58,7 @@ public class EntityMixin implements AdvancedComponentHolder {
 	private void readComponents(NbtCompound nbt, CallbackInfo ci) {
 		COMPONENT_CODEC.parse(NbtOps.INSTANCE, nbt)
 			.resultOrPartial(error -> EuclidsElements.LOGGER.warn("Failed to load entity components: {}", error))
-			.ifPresent(components -> this.setComponents(new ComponentMapImpl(components)));
+			.ifPresent(components -> this.setAdvancedComponents(new ComponentMapImpl(components)));
 	}
 
 }
