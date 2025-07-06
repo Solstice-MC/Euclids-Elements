@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.content.api.command;
+package org.solstice.euclidsElements.api.command;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.mojang.brigadier.StringReader;
@@ -65,7 +65,7 @@ public abstract class ListedRegistryEntryArgumentType<T> implements ArgumentType
 	}
 
 	@VisibleForTesting
-	static NbtElement parseAsNbt(StringReader stringReader) throws CommandSyntaxException {
+	public static NbtElement parseAsNbt(StringReader stringReader) throws CommandSyntaxException {
 		int i = stringReader.getCursor();
 		NbtElement nbtElement = (new StringNbtReader(stringReader)).parseElement();
 		if (hasFinishedReading(stringReader)) {
@@ -82,7 +82,7 @@ public abstract class ListedRegistryEntryArgumentType<T> implements ArgumentType
 		}
 	}
 
-	private static boolean hasFinishedReading(StringReader stringReader) {
+	public static boolean hasFinishedReading(StringReader stringReader) {
 		return !stringReader.canRead() || stringReader.peek() == ' ';
 	}
 

@@ -19,7 +19,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableFloat;
-import org.solstice.euclidsElements.effectHolder.registry.EuclidsEnchantmentEffects;
 
 import java.util.List;
 import java.util.Set;
@@ -45,10 +44,6 @@ public interface EffectHolder {
      * @return The definition of this effect holder
      */
     Definition getDefinition();
-
-    default boolean slotMatches(EquipmentSlot equipmentSlot) {
-        return this.getDefinition().getSlots().stream().anyMatch(slot -> slot.matches(equipmentSlot));
-    }
 
     static <T> void applyEffects(List<EnchantmentEffectEntry<T>> entries, LootContext context, Consumer<T> effectConsumer) {
         entries.forEach(effect -> {
@@ -140,9 +135,22 @@ public interface EffectHolder {
         this.modifyValue(EnchantmentEffectComponentTypes.AMMO_USE, world, level, projectileStack, ammoUse);
     }
 
+	static void applyTargetedEffect(TargetedEnchantmentEffect<EnchantmentEntityEffect> effect, ServerWorld world, int level, EnchantmentEffectContext context, Entity user, DamageSource damageSource) {
+		LootContext lootContext = Enchantment.createEnchantedDamageLootContext(world, level, user, damageSource);
+		if (!effect.test(lootContext)) return;
+
+		Entity entity = switch (effect.affected()) {
+			case ATTACKER -> damageSource.getAttacker();
+			case DAMAGING_ENTITY -> damageSource.getSource();
+			case VICTIM -> user;
+		};
+
+		if (entity != null) effect.effect().apply(world, level, context, entity, entity.getPos());
+	}
+
     default void onTargetDamaged(ServerWorld world, int level, EnchantmentEffectContext context, EnchantmentEffectTarget target, Entity user, DamageSource damageSource) {
         for (TargetedEnchantmentEffect<EnchantmentEntityEffect> effect : this.getEffect(EnchantmentEffectComponentTypes.POST_ATTACK)) {
-            if (target == effect.enchanted()) Enchantment.applyTargetedEffect(effect, world, level, context, user, damageSource);
+            if (target == effect.enchanted()) applyTargetedEffect(effect, world, level, context, user, damageSource);
         }
     }
 
@@ -206,13 +214,9 @@ public interface EffectHolder {
         this.modifyValue(EnchantmentEffectComponentTypes.CROSSBOW_CHARGE_TIME, random, level, crossbowChargeTime);
     }
 
-	default void modifyMaxDurability(int level, MutableFloat maxDurability) {
-		this.modifyValue(EuclidsEnchantmentEffects.MAX_DURABILITY, Random.create(), level, maxDurability);
-	}
-
     default void applyLocationBasedEffects(ServerWorld world, int level, EnchantmentEffectContext context, LivingEntity user) {
 		Set<EnchantmentLocationBasedEffect> locationEffects = user.getLocationBasedEffects().remove(this);
-        if (context.slot() != null && !this.slotMatches(context.slot())) {
+        if (!this.getDefinition().matches(context)) {
 			if (locationEffects != null) locationEffects.forEach(effect -> effect.remove(context, user, user.getPos(), level));
 			return;
 		}
@@ -253,19 +257,29 @@ public interface EffectHolder {
      */
     interface Definition {
 
-        /**
-         * Gets the maximum level this effect holder can have.
-         *
-         * @return The maximum level
-         */
-        int getMaxLevel();
+		/**
+		 * Gets the maximum level this effect holder can have.
+		 *
+		 * @return The maximum level
+		 */
+		int getMaxLevel();
 
-        /**
-         * Gets the list of equipment slots this effect holder can be applied to.
-         *
-         * @return The list of applicable equipment slots
-         */
-        List<AttributeModifierSlot> getSlots();
+		/**
+		 * Gets the list of equipment slots this effect holder can be applied to.
+		 *
+		 * @return The list of applicable equipment slots
+		 */
+		List<AttributeModifierSlot> getSlots();
+
+		default boolean contains(AttributeModifierSlot slot) {
+			return this.getSlots().contains(slot);
+		}
+
+		default boolean matches(EnchantmentEffectContext context) {
+			EquipmentSlot slot = context.slot();
+			if (slot == null) return false;
+			return this.getSlots().stream().anyMatch(dSlot -> dSlot.matches(slot));
+		}
 
     }
 

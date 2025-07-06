@@ -7,12 +7,12 @@ import org.solstice.euclidsElements.effectHolder.api.EffectHolder;
 import java.util.List;
 
 /**
- * A specialized effect holder component that manages effects that all have a level of 1.
+ * A specialized effect holder component that manages unleveled effects.
  * This component simplifies the storage by maintaining just a list of effects rather than a map of effects to levels.
  *
  * @param <T> The type of effect holder this component manages, must extend {@link EffectHolder}
  */
-public interface UnleveledEffectHolderComponent<T extends EffectHolder> extends EffectHolderComponent<T> {
+public interface GenericEffectHolderComponent<T extends EffectHolder> extends EffectHolderComponent<T> {
 
     /**
      * Gets the list of effects managed by this component.
@@ -20,18 +20,16 @@ public interface UnleveledEffectHolderComponent<T extends EffectHolder> extends 
      *
      * @return A list of registry entries for the effects
      */
-	List<RegistryEntry<T>> getAllEffects();
+	List<RegistryEntry<T>> getEffectsList();
 
     /**
      * Converts the list of single effects into a map where all effects have a level of 1.
      * This method overrides the parent interface method to provide the appropriate implementation.
-     *
-     * @return A map containing registry entries of effect holders mapped to level 1
      */
     @Override
     default Object2IntOpenHashMap<RegistryEntry<T>> getEffects() {
         Object2IntOpenHashMap<RegistryEntry<T>> result = new Object2IntOpenHashMap<>();
-        this.getAllEffects().forEach(entry -> result.put(entry, 1));
+        this.getEffectsList().forEach(entry -> result.put(entry, 1));
         return result;
     }
 

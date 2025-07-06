@@ -55,9 +55,8 @@ public interface AdvancedComponentHolder extends ComponentHolder {
 		return this.set(type, applier.apply(object));
 	}
 
-	@Nullable
-	default <T> T remove(ComponentType<? extends T> type) {
-		return this.getAdvancedComponents().remove(type);
+	default <T> void remove(ComponentType<? extends T> type) {
+		this.getAdvancedComponents().remove(type);
 	}
 
 }

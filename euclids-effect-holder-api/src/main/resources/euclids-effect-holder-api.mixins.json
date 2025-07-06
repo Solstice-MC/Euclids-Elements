@@ -7,9 +7,8 @@
 		"EnchantmentHelperMixin",
 		"EnchantmentMixin",
 		"ItemEnchantmentsComponentMixin",
-		"ItemStackMixin",
 		"LivingEntityMixin",
-		"test.BlockMixin"
+		"BlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
