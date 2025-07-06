@@ -16,16 +16,16 @@ jobs:
                   distribution: "temurin"
                   java-version: 21
                   cache: "gradle"
-#            - name: Publish modules
-#              run: ./gradlew publish
+            - name: Publish modules
+              run: ./gradlew publish
+              env:
+                  CLOUDSMITH_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
+                  CLOUDSMITH_TOKEN: ${{ secrets.CLOUDSMITH_TOKEN }}
             - name: Build project
               run: ./gradlew clean build
             - name: Publish files
               uses: Kir-Antipov/mc-publish@v3.3
               with:
-#                  curseforge-id: "${{ vars.CURSEFORGE_ID }}"
-#                  curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
-#                  curseforge-version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
                   modrinth-id: "${{ vars.MODRINTH_ID }}"
                   modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
                   modrinth-version-type: ${{ github.event.release.prerelease && 'beta' || 'release' }}
