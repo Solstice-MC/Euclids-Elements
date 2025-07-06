@@ -16,8 +16,8 @@ jobs:
                   distribution: "temurin"
                   java-version: 21
                   cache: "gradle"
-            - name: Publish modules
-              run: ./gradlew publish
+#            - name: Publish modules
+#              run: ./gradlew publish
             - name: Build project
               run: ./gradlew clean build
             - name: Publish files
