@@ -3,7 +3,8 @@
 	"package": "org.solstice.euclidsElements.componentHolder.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"EntityMixin"
+		"EntityMixin",
+		"ItemStackMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

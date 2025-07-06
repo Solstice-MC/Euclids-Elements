@@ -29,4 +29,6 @@ public abstract class LivingEntityMixin extends Entity implements EntityEffectHo
         return this.locationBasedEffects;
     }
 
+
+
 }

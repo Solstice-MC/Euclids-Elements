@@ -3,6 +3,7 @@
 	"package": "org.solstice.euclidsElements.content.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"CommandSourceMixin",
 		"ItemStackMixin",
 		"ServerPlayerInteractionManagerMixin",
 		"itemCollapse.PlayerEntityMixin",

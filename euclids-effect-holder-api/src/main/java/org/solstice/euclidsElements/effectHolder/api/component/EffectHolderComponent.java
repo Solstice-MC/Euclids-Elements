@@ -17,12 +17,6 @@ public interface EffectHolderComponent<T extends EffectHolder> {
 
     Object2IntOpenHashMap<RegistryEntry<T>> getEffects();
 
-    /**
-     * Gets the level of a specific effect holder.
-     *
-     * @param effect The registry entry of the effect holder to get the level for
-     * @return The level of the effect, or 0 if the effect is not present
-     */
     default int getLevel(RegistryEntry<T> effect) {
         return this.getEffects().getOrDefault(effect, 0);
     }

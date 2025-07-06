@@ -1,0 +1,7 @@
+accessWidener v2 named
+
+accessible method net/minecraft/command/argument/RegistryKeyArgumentType getRegistryEntry (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Lnet/minecraft/registry/RegistryKey;Lcom/mojang/brigadier/exceptions/DynamicCommandExceptionType;)Lnet/minecraft/registry/entry/RegistryEntry$Reference;
+accessible method net/minecraft/command/argument/RegistryKeyArgumentType getKey (Lcom/mojang/brigadier/context/CommandContext;Ljava/lang/String;Lnet/minecraft/registry/RegistryKey;Lcom/mojang/brigadier/exceptions/DynamicCommandExceptionType;)Lnet/minecraft/registry/RegistryKey;
+
+accessible method net/minecraft/component/ComponentChanges <init> (Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;)V
+accessible field net/minecraft/component/ComponentChanges changedComponents Lit/unimi/dsi/fastutil/objects/Reference2ObjectMap;
