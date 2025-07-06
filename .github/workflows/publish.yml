@@ -1,6 +1,6 @@
 on:
     release:
-        types: [published]
+        types: [created]
 
 jobs:
     publish:
@@ -10,19 +10,23 @@ jobs:
         steps:
             - name: Checkout repo
               uses: actions/checkout@v3
+
             - name: Setup JDK
               uses: actions/setup-java@v3
               with:
                   distribution: "temurin"
                   java-version: 21
                   cache: "gradle"
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v3
+
+            - name: Build project
+              run: ./gradlew clean build
             - name: Publish modules
               run: ./gradlew publish
               env:
-                  CLOUDSMITH_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
-                  CLOUDSMITH_TOKEN: ${{ secrets.CLOUDSMITH_TOKEN }}
-            - name: Build project
-              run: ./gradlew clean build
+                  MAVEN_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
+                  MAVEN_PASSWORD: ${{ secrets.CLOUDSMITH_TOKEN }}
             - name: Publish files
               uses: Kir-Antipov/mc-publish@v3.3
               with:

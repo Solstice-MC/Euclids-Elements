@@ -27,7 +27,7 @@ allprojects {
 
 	publishing {
 		publications {
-			mavenJava(MavenPublication) {
+			create("mavenJava", MavenPublication) {
 				from components.java
 			}
 		}
@@ -36,8 +36,8 @@ allprojects {
 				name = "cloudsmith"
 				url = "https://maven.cloudsmith.io/solstice-mc/artifacts/"
 				credentials {
-					username = System.getenv('CLOUDSMITH_USERNAME')
-					password = System.getenv('CLOUDSMITH_API_KEY')
+					username = System.getenv("MAVEN_USERNAME")
+					password = System.getenv("MAVEN_PASSWORD")
 				}
 			}
 		}
