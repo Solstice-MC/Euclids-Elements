@@ -42,7 +42,7 @@ public abstract class EnchantmentHelperMixin {
 	private static void wrapForEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer, Operation<Void> original) {
 		try {
 			EffectHolderHelper.forEachEffectHolder(stack, consumer);
-		} catch (ClassCastException exception) {
+		} catch (ClassCastException | IncompatibleClassChangeError exception) {
 			original.call(stack, consumer);
 		}
 	}
@@ -51,7 +51,7 @@ public abstract class EnchantmentHelperMixin {
 	private static void wrapForEachEnchantment(LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer, Operation<Void> original) {
 		try {
 			EffectHolderHelper.forEachEffectHolder(entity, consumer);
-		} catch (ClassCastException exception) {
+		} catch (ClassCastException | IncompatibleClassChangeError exception) {
 			original.call(entity, consumer);
 		}
 	}
@@ -60,7 +60,7 @@ public abstract class EnchantmentHelperMixin {
 	private static void wrapForEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer, Operation<Void> original) {
 		try {
 			EffectHolderHelper.forEachEffectHolder(stack, slot, entity, consumer);
-		} catch (ClassCastException exception) {
+		} catch (ClassCastException | IncompatibleClassChangeError exception) {
 			original.call(stack, slot, entity, consumer);
 		}
 	}
