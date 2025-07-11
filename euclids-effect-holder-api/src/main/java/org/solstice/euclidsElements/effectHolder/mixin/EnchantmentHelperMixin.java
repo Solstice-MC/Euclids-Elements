@@ -7,7 +7,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.component.type.AttributeModifierSlot;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
@@ -21,12 +20,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContext;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -34,8 +30,6 @@ import org.jetbrains.annotations.Nullable;
 import org.solstice.euclidsElements.effectHolder.api.EffectHolderHelper;
 import org.spongepowered.asm.mixin.Mixin;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -46,17 +40,29 @@ public abstract class EnchantmentHelperMixin {
 
 	@WrapMethod(method = "forEachEnchantment(Lnet/minecraft/item/ItemStack;Lnet/minecraft/enchantment/EnchantmentHelper$Consumer;)V")
 	private static void wrapForEachEnchantment(ItemStack stack, EnchantmentHelper.Consumer consumer, Operation<Void> original) {
-		EffectHolderHelper.forEachEffectHolder(stack, consumer);
+		try {
+			EffectHolderHelper.forEachEffectHolder(stack, consumer);
+		} catch (ClassCastException exception) {
+			original.call(stack, consumer);
+		}
 	}
 
 	@WrapMethod(method = "forEachEnchantment(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer;)V")
 	private static void wrapForEachEnchantment(LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer, Operation<Void> original) {
-		EffectHolderHelper.forEachEffectHolder(entity, consumer);
+		try {
+			EffectHolderHelper.forEachEffectHolder(entity, consumer);
+		} catch (ClassCastException exception) {
+			original.call(entity, consumer);
+		}
 	}
 
 	@WrapMethod(method = "forEachEnchantment(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EquipmentSlot;Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/enchantment/EnchantmentHelper$ContextAwareConsumer;)V")
 	private static void wrapForEachEnchantment(ItemStack stack, EquipmentSlot slot, LivingEntity entity, EnchantmentHelper.ContextAwareConsumer consumer, Operation<Void> original) {
-		EffectHolderHelper.forEachEffectHolder(stack, slot, entity, consumer);
+		try {
+			EffectHolderHelper.forEachEffectHolder(stack, slot, entity, consumer);
+		} catch (ClassCastException exception) {
+			original.call(stack, slot, entity, consumer);
+		}
 	}
 
 	@WrapMethod(method = "getEquipmentDropChance")
@@ -288,9 +294,8 @@ public abstract class EnchantmentHelperMixin {
 	@WrapMethod(method = "applyAttributeModifiers(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EquipmentSlot;Ljava/util/function/BiConsumer;)V")
 	private static void applyAttributeModifiers(ItemStack stack, EquipmentSlot slot, BiConsumer<RegistryEntry<EntityAttribute>, EntityAttributeModifier> consumer, Operation<Void> original) {
 		EffectHolderHelper.forEachEffectHolder(stack, slot, (effectHolder, level) ->
-			effectHolder.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach(effect -> {
-					consumer.accept(effect.attribute(), effect.createAttributeModifier(level, slot));
-				}
+			effectHolder.value().getEffect(EnchantmentEffectComponentTypes.ATTRIBUTES).forEach(effect ->
+				consumer.accept(effect.attribute(), effect.createAttributeModifier(level, slot))
 			));
 	}
 
