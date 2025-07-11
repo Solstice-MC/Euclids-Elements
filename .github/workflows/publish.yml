@@ -22,11 +22,6 @@ jobs:
 
             - name: Build project
               run: ./gradlew clean build
-            - name: Publish modules
-              run: ./gradlew publish
-              env:
-                  MAVEN_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
-                  MAVEN_PASSWORD: ${{ secrets.CLOUDSMITH_TOKEN }}
             - name: Publish files
               uses: Kir-Antipov/mc-publish@v3.3
               with:
@@ -45,3 +40,8 @@ jobs:
                       1.21.1
                   dependencies: |
                       fabric-api
+            - name: Publish modules
+              run: ./gradlew publish
+              env:
+                  MAVEN_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
+                  MAVEN_PASSWORD: ${{ secrets.CLOUDSMITH_TOKEN }}
