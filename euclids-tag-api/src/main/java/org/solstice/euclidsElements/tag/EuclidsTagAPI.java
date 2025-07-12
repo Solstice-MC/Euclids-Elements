@@ -24,16 +24,21 @@ import org.solstice.euclidsElements.tag.content.network.packets.RegistryMapTagSy
 import org.solstice.euclidsElements.tag.content.network.task.RegistryMapTagTask;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class EuclidsTagAPI implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		AtomicReference<MapTagLoader<?, ?>> loaderReference = new AtomicReference<>();
 		ResourceManagerHelper.get(ResourceType.SERVER_DATA).registerReloadListener(MapTagLoader.ID, registries -> {
 			MapTagLoader<?, ?> loader = new MapTagLoader<>(registries);
-			CommonLifecycleEvents.TAGS_LOADED.register(loader::apply);
+			loaderReference.set(loader);
 			return loader;
 		});
+		CommonLifecycleEvents.TAGS_LOADED.register((registries, client) ->
+			loaderReference.get().apply(registries, client)
+		);
 
 		ServerConfigurationConnectionEvents.CONFIGURE.register(RegistryMapTagTask::register);
 		PayloadTypeRegistry.configurationC2S().register(KnownRegistryMapTagsReplyPacket.ID, KnownRegistryMapTagsReplyPacket.PACKET_CODEC);

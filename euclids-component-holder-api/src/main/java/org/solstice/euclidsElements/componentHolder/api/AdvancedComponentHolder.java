@@ -1,6 +1,5 @@
 package org.solstice.euclidsElements.componentHolder.api;
 
-import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.component.ComponentType;
@@ -9,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.UnaryOperator;
 
-public interface AdvancedComponentHolder extends ComponentHolder {
+public interface AdvancedComponentHolder extends ModifiableComponentHolder {
 
 	default ComponentMapImpl getAdvancedComponents() {
 		return null;
@@ -21,6 +20,11 @@ public interface AdvancedComponentHolder extends ComponentHolder {
 	@Override
 	default ComponentMap getComponents() {
 		return this.getAdvancedComponents();
+	}
+
+	@Override
+	default void setComponents(ComponentMap components) {
+		this.setAdvancedComponents(new ComponentMapImpl(components));
 	}
 
 	@Override
