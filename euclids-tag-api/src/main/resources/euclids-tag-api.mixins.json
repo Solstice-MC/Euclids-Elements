@@ -3,11 +3,14 @@
 	"package": "org.solstice.euclidsElements.tag.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"TagGroupLoaderMixin",
+		"mapTag.RegistryEntryMixin",
 		"mapTag.RegistryEntryReferenceMixin",
+		"mapTag.RegistryMixin",
 		"mapTag.RegistryWrapperImplDelegatingMixin",
+		"mapTag.RegistryWrapperImplMixin",
 		"mapTag.SimpleRegistryLookupMixin",
-		"mapTag.SimpleRegistryMixin",
-		"TagGroupLoaderMixin"
+		"mapTag.SimpleRegistryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

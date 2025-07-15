@@ -10,8 +10,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.solstice.euclidsElements.tag.api.registry.MapTagAccessor;
-import org.solstice.euclidsElements.tag.api.registry.MapTagHolder;
 import org.solstice.tabula.content.HumorValue;
 import org.solstice.tabula.registry.TabulaTags;
 
@@ -30,7 +28,7 @@ public class HumorCheckerItem extends Item {
 		BlockPos pos = context.getBlockPos();
 		Block block = world.getBlockState(pos).getBlock();
 
-		HumorValue humorous = Registries.BLOCK.getEntry(block).getValue(TabulaTags.HUMOROUS);
+		HumorValue humorous = Registries.BLOCK.getEntry(block).getMapValue(TabulaTags.HUMOROUS);
 		if (humorous == null) {
 			player.sendMessage(Text.translatable("block.humorous.unknown").formatted(Formatting.GREEN), true);
 			return ActionResult.PASS;
