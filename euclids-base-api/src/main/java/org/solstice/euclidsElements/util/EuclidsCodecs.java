@@ -17,6 +17,11 @@ public class EuclidsCodecs {
 	);
 
 	@SuppressWarnings("unchecked")
+	public static <T> Codec<T> merge(Codec<? extends T> primary, Codec<? extends T> alternative) {
+		return new MergedCodec<>((Codec<T>) primary, (Codec<T>) alternative);
+	}
+
+	@SuppressWarnings("unchecked")
 	public static <T> Codec<T> merge(Codec<? extends T> primary, Codec<? extends T>... alternatives) {
 		return new MergedCodec<>((Codec<T>) primary, (Codec<T>[]) alternatives);
 	}

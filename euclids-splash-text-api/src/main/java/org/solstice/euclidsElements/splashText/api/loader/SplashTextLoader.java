@@ -2,6 +2,7 @@ package org.solstice.euclidsElements.splashText.api.loader;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mojang.serialization.JsonOps;
 import org.solstice.euclidsElements.splashText.api.manager.SplashTextManager;
 import org.solstice.euclidsElements.splashText.api.type.SimpleSplashText;
 import org.solstice.euclidsElements.splashText.api.type.SplashText;
@@ -61,13 +62,13 @@ public class SplashTextLoader implements SimpleResourceReloadListener<Void> {
 	}
 
     public void addSplashes(Identifier identifier, JsonElement element) {
-        if (!element.isJsonObject()) {
-            EuclidsElements.LOGGER.error("Unable to load splash file: '{}', file must be an object containing splash value data", identifier);
-            return;
-        }
-        SplashTextFile.fromJson(element.getAsJsonObject()).getTexts()
-            .filter(SplashText::validate)
-            .forEach(SplashTextManager.INSTANCE::addSplashText);
+		try {
+			SplashTextFile.CODEC.parse(JsonOps.INSTANCE, element.getAsJsonObject()).getOrThrow().getTexts()
+				.filter(SplashText::validate)
+				.forEach(SplashTextManager.INSTANCE::addSplashText);
+		} catch (Exception exception) {
+			EuclidsElements.LOGGER.error("Unable to load splash file: '{}'", identifier, exception);
+		}
     }
 
     public void addOldSplashes(Identifier ignored, Stream<String> stream) {
