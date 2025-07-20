@@ -65,11 +65,18 @@ java {
 	targetCompatibility = JavaVersion.VERSION_21
 }
 
-
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			artifactId = 'euclids-elements'
 		}
+	}
+}
+
+afterEvaluate {
+	loom.runs.configureEach {
+		vmArgs "-XX:+IgnoreUnrecognizedVMOptions",
+			"-XX:+AllowEnhancedClassRedefinition",
+			"-javaagent:${configurations.compileClasspath.find { it.name.contains("sponge-mixin") }}"
 	}
 }

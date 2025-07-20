@@ -1,12 +1,9 @@
 package org.solstice.euclidsElements.effectHolder.api;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.component.ComponentHolder;
 import net.minecraft.component.ComponentType;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentEffectContext;
 import net.minecraft.enchantment.effect.EnchantmentEffectTarget;
@@ -26,6 +23,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.jetbrains.annotations.Nullable;
 import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.effectHolder.api.component.EffectHolderComponent;
 import org.solstice.euclidsElements.util.RegistryHelper;
@@ -60,97 +58,59 @@ public abstract class EffectHolderHelper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, Consumer<T> consumer) {
+	public static <T extends EffectHolder> void forEntityEffectHolders(LivingEntity entity, ContextAwareConsumer<T> consumer) {
+		EnchantmentEffectContext context = new EnchantmentEffectContext(null, null, entity);
 		EFFECT_HOLDER_COMPONENTS.forEach((ComponentType<?> componentType) -> {
-			List<EffectHolderComponent<T>> components = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack);
-			components.stream()
-				.map(EffectHolderComponent::getEffects)
-				.forEach(effects ->
-					effects.forEach(consumer::accept)
-				);
-		});
-    }
-
-	@SuppressWarnings("unchecked")
-	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, LivingEntity entity, ContextAwareConsumer<T> consumer) {
-		EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
-		EFFECT_HOLDER_COMPONENTS.forEach((ComponentType<?> componentType) -> {
-			List<EffectHolderComponent<T>> entityComponents = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, entity);
-			entityComponents.stream()
-				.map(EffectHolderComponent::getEffects)
-				.forEach(effects ->
-					effects.forEach((entry, level) -> consumer.accept(entry, level, context))
-				);
-			List<EffectHolderComponent<T>> itemComponents = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack);
-			itemComponents.stream()
-				.map(EffectHolderComponent::getEffects)
-				.forEach(effects ->
-					effects.forEach((entry, level) -> {
-						if (entry.value().getDefinition().matches(context)) consumer.accept(entry, level, context);
-					})
-				);
+			EffectHolderComponent<T> component = getComponent((ComponentType<EffectHolderComponent<T>>) componentType, entity);
+			if (component != null) component.getEffects().forEach(
+				(entry, level) -> consumer.accept(entry, level, context)
+			);
 		});
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, Consumer<T> consumer) {
+	public static <T extends EffectHolder> void forStackEffectHolder(ItemStack stack, Consumer<T> consumer) {
+		EFFECT_HOLDER_COMPONENTS.forEach((ComponentType<?> componentType) -> {
+			EffectHolderComponent<T> component = getComponent((ComponentType<EffectHolderComponent<T>>) componentType, stack);
+			if (component != null) component.getEffects().forEach(consumer::accept);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends EffectHolder> void forStackEffectHolder(ItemStack stack, EquipmentSlot slot, ContextAwareConsumer<T> consumer) {
 		EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, null);
 		EFFECT_HOLDER_COMPONENTS.forEach((ComponentType<?> componentType) -> {
-			List<EffectHolderComponent<T>> components = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack);
-			components.stream()
-				.map(EffectHolderComponent::getEffects)
-				.forEach(effects ->
-					effects.forEach((entry, level) -> {
-						if (entry.value().getDefinition().matches(context))
-							consumer.accept(entry, level);
-					})
-				);
+			EffectHolderComponent<T> component = getComponent((ComponentType<EffectHolderComponent<T>>) componentType, stack);
+			if (component != null) component.getEffects().forEach((entry, level) -> {
+				if (entry.value().getDefinition().matches(context)) consumer.accept(entry, level, context);
+			});
 		});
 	}
 
-	@SuppressWarnings("unchecked")
+	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, Consumer<T> consumer) {
+		forStackEffectHolder(stack, consumer);
+    }
+
+	public static <T extends EffectHolder> void forEachEffectHolder(ItemStack stack, EquipmentSlot slot, LivingEntity entity, ContextAwareConsumer<T> consumer) {
+		forEntityEffectHolders(entity, consumer);
+		forStackEffectHolder(stack, slot, consumer);
+	}
+
 	public static <T extends EffectHolder> void forEachEffectHolder(LivingEntity entity, ContextAwareConsumer<T> consumer) {
-		EFFECT_HOLDER_COMPONENTS.forEach((ComponentType<?> componentType) -> {
-			EnchantmentEffectContext entityContext = new EnchantmentEffectContext(null, null, entity);
-			List<EffectHolderComponent<T>> entityComponents = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, entity);
-			entityComponents.stream()
-				.map(EffectHolderComponent::getEffects)
-				.forEach(effects ->
-					effects.forEach((entry, level) -> consumer.accept(entry, level, entityContext))
-				);
-			for (EquipmentSlot slot : EquipmentSlot.values()) {
-				ItemStack stack = entity.getEquippedStack(slot);
-				EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
-				List<EffectHolderComponent<T>> itemComponents = getComponents((ComponentType<EffectHolderComponent<T>>) componentType, stack);
-				itemComponents.stream()
-					.map(EffectHolderComponent::getEffects)
-					.forEach(effects ->
-						effects.forEach((entry, level) -> {
-							if (entry.value().getDefinition().matches(context))
-								consumer.accept(entry, level, context);
-						})
-					);
-			}
-		});
+		forEntityEffectHolders(entity, consumer);
+		for (EquipmentSlot slot : EquipmentSlot.values()) {
+			ItemStack stack = entity.getEquippedStack(slot);
+			forStackEffectHolder(stack, slot, consumer);
+		}
 	}
 
-	@SafeVarargs
-	public static <T extends EffectHolder, R extends ComponentHolder> List<EffectHolderComponent<T>> getComponents(
+	@Nullable
+	public static <T extends EffectHolder, R extends ComponentHolder> EffectHolderComponent<T> getComponent(
 		ComponentType<EffectHolderComponent<T>> componentType,
-		R... componentHolders
+		R componentHolder
 	) {
-		return getComponents(componentType, Arrays.stream(componentHolders).toList());
-	}
-
-	public static <T extends EffectHolder, R extends ComponentHolder> List<EffectHolderComponent<T>> getComponents(
-		ComponentType<EffectHolderComponent<T>> componentType,
-		List<R> componentHolders
-	) {
-		return componentHolders.stream()
-			.filter(Objects::nonNull)
-			.map(holder -> holder.get(componentType))
-			.filter(Objects::nonNull)
-			.toList();
+		if (componentHolder != null) return componentHolder.get(componentType);
+		return null;
 	}
 
 	public static float getEquipmentDropChance(ServerWorld world, LivingEntity target, DamageSource source, float base, Operation<Float> original) {
@@ -185,8 +145,7 @@ public abstract class EffectHolderHelper {
 			ItemStack stack = entity.getEquippedStack(slot);
 			if (!stackPredicate.test(stack)) continue;
 
-			EnchantmentEffectContext context = new EnchantmentEffectContext(stack, slot, entity);
-			EffectHolderHelper.forEachEffectHolder(stack, slot, (effectHolder, level) -> {
+			EffectHolderHelper.forEachEffectHolder(stack, slot, entity, (effectHolder, level, context) -> {
 				if (effectHolder.value().getEffects().contains(componentType) && effectHolder.value().getDefinition().matches(context))
 					result.add(new EnchantmentEffectContext(stack, slot, entity));
 			});

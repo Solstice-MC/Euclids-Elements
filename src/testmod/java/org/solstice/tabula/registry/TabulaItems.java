@@ -1,12 +1,16 @@
 package org.solstice.tabula.registry;
 
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.BundleContentsComponent;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import org.solstice.euclidsElements.content.api.item.bundle.TaggedBundleItem;
 import org.solstice.tabula.Tabula;
+import org.solstice.tabula.content.item.BreadstickBasketItem;
 import org.solstice.tabula.content.item.HumorCheckerItem;
 import org.solstice.tabula.content.item.PlayerHumorCheckerItem;
 import org.solstice.tabula.content.item.WeightsItem;
@@ -20,6 +24,12 @@ public class TabulaItems {
 	public static final Item WEIGHTS = register("weights", WeightsItem::new);
 	public static final Item POCKET_MIRROR = register("pocket_mirror", PlayerHumorCheckerItem::new);
 	public static final Item EMERALD_TABLET = register("emerald_tablet", HumorCheckerItem::new);
+
+	public static final Item BREADSTICK_BASKET = register("breadstick_basket", BreadstickBasketItem::new,
+		new Item.Settings()
+			.maxCount(1)
+			.component(DataComponentTypes.BUNDLE_CONTENTS, BundleContentsComponent.DEFAULT)
+	);
 
 	public static Item register(String name) {
 		return register(name, Item::new);

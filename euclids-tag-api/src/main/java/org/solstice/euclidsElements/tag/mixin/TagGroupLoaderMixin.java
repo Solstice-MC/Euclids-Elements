@@ -7,6 +7,7 @@ import net.minecraft.registry.tag.TagGroupLoader;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
+import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.tag.content.RemovalTagFile;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,11 +35,16 @@ public class TagGroupLoaderMixin {
 		@Local JsonElement element,
 		@Local List<TagGroupLoader.TrackedEntry> entries
 	) {
-		RemovalTagFile file = RemovalTagFile.CODEC.parse(JsonOps.INSTANCE, element).getOrThrow();
+		try {
+			RemovalTagFile file = RemovalTagFile.CODEC.parse(JsonOps.INSTANCE, element).getOrThrow();
 
-		file.removals().forEach(entry -> {
-			entries.removeIf(loadedEntry -> loadedEntry.entry().id.equals(entry.id));
-		});
+			file.removals().forEach(entry ->
+				entries.removeIf(loadedEntry -> loadedEntry.entry().id.equals(entry.id))
+			);
+		} catch (Exception exception) {
+			EuclidsElements.LOGGER.error("Unable to load tag removals", exception);
+		}
+
 	}
 
 }

@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public abstract class EntityMixin implements AdvancedComponentHolder {
 
-
 	@Unique
 	private static final String COMPONENT_ID = EuclidsElements.of("components").toString();
 

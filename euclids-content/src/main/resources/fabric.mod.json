@@ -11,10 +11,14 @@
 		"client": [ "org.solstice.euclidsElements.content.EuclidsContentClient" ]
 	},
 	"mixins": [ "euclids-content.mixins.json" ],
+	"accessWidener": "euclids-content.accesswidener",
 	"custom": {
 		"loom:injected_interfaces": {
 			"net/minecraft/entity/player/PlayerEntity": [ "org/solstice/euclidsElements/content/api/entity/PlayerItemCollapseManager" ],
-			"net/minecraft/item/ItemStack": [ "org/solstice/euclidsElements/content/api/item/FuelItemStack" ]
+			"net/minecraft/item/ItemStack": [ "org/solstice/euclidsElements/content/api/item/FuelItemStack" ],
+
+			"net/minecraft/item/BundleItem": [ "org/solstice/euclidsElements/content/api/item/bundle/EuclidsBundleItem" ],
+			"net/minecraft/component/type/BundleContentsComponent\u0024Builder": [ "org/solstice/euclidsElements/content/api/item/bundle/EuclidsBundleContentsComponentBuilder" ]
 		}
 	},
 
