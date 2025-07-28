@@ -8,8 +8,10 @@ jobs:
         permissions:
             contents: write
         steps:
-            - name: Checkout repo
+            - name: Checkout
               uses: actions/checkout@v3
+            - name: Change Version
+              run: sed -i 's/mod_version=.*/mod_version=${{ github.event.release.tag_name }}/g' gradle.properties
 
             - name: Setup JDK
               uses: actions/setup-java@v3
@@ -20,9 +22,9 @@ jobs:
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v3
 
-            - name: Build project
+            - name: Build Project
               run: ./gradlew clean build
-            - name: Publish files
+            - name: Publish Mod
               uses: Kir-Antipov/mc-publish@v3.3
               with:
                   modrinth-id: "${{ vars.MODRINTH_ID }}"
@@ -40,7 +42,7 @@ jobs:
                       1.21.1
                   dependencies: |
                       fabric-api
-            - name: Publish modules
+            - name: Publish Modules
               run: ./gradlew publish
               env:
                   MAVEN_USERNAME: ${{ secrets.CLOUDSMITH_USERNAME }}
