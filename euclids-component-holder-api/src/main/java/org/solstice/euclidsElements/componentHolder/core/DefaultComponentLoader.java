@@ -10,7 +10,7 @@ import net.minecraft.resource.ResourceFinder;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import org.solstice.euclidsElements.EuclidsElements;
-import org.solstice.euclidsElements.componentHolder.api.ModifiableComponentHolder;
+import org.solstice.euclidsElements.componentHolder.api.MutableComponentHolder;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,12 +78,12 @@ public class DefaultComponentLoader implements SimpleSynchronousResourceReloadLi
 	}
 
 	public void modifyEntries(RegistryEntryList<?> entries, ComponentChangeData data) {
-		List<ModifiableComponentHolder> holders = entries.stream()
+		List<MutableComponentHolder> holders = entries.stream()
 			.map(RegistryEntry::value)
-			.filter(value -> value instanceof ModifiableComponentHolder)
-			.map(value -> (ModifiableComponentHolder) value)
+			.filter(value -> value instanceof MutableComponentHolder)
+			.map(value -> (MutableComponentHolder) value)
 			.toList();
-		for (ModifiableComponentHolder holder : holders) {
+		for (MutableComponentHolder holder : holders) {
 			ComponentMap.Builder builder = ComponentMap.builder().addAll(holder.getComponents());
 			builder.addAll(data.components());
 			ComponentMapImpl components = new ComponentMapImpl(builder.build());

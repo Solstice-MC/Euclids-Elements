@@ -6,6 +6,7 @@
 		"EntityMixin",
 		"ItemMixin",
 		"ItemStackMixin",
+		"ServerWorldMixin",
 		"WorldMixin"
 	],
 	"injectors": {

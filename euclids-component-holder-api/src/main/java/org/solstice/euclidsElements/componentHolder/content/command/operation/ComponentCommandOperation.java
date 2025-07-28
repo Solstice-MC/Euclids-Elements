@@ -15,7 +15,7 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
+import org.solstice.euclidsElements.componentHolder.api.MutableComponentHolder;
 import org.solstice.euclidsElements.componentHolder.content.command.target.ComponentCommandTarget;
 
 import java.util.List;
@@ -35,15 +35,15 @@ public interface ComponentCommandOperation {
 
 	default <T> void executeOperation(
 		CommandContext<ServerCommandSource> context,
-		AdvancedComponentHolder holder,
+		MutableComponentHolder holder,
 		ComponentType<T> component,
-		ComponentCommandTarget<AdvancedComponentHolder> target,
+		ComponentCommandTarget<MutableComponentHolder> target,
 		RegistryOps<NbtElement> registryOps
 	) {}
 
 	@SuppressWarnings("unchecked")
-	default <T> int execute(CommandContext<ServerCommandSource> context, ComponentCommandTarget<AdvancedComponentHolder> target) throws CommandSyntaxException {
-		AdvancedComponentHolder holder = target.getHolder(context);
+	default <T> int execute(CommandContext<ServerCommandSource> context, ComponentCommandTarget<MutableComponentHolder> target) throws CommandSyntaxException {
+		MutableComponentHolder holder = target.getHolder(context);
 		if (holder == null) {
 			Text message = Text.translatable("commands.component.failed", "Target does not exist");
 			throw new CommandSyntaxException(FAILED_EXCEPTION, message);

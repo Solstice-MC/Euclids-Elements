@@ -7,7 +7,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
-import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
+import org.solstice.euclidsElements.componentHolder.api.MutableComponentHolder;
 import org.solstice.tabula.content.HumorValue;
 import org.solstice.tabula.registry.TabulaComponentTypes;
 
@@ -21,10 +21,10 @@ public class PlayerHumorCheckerItem extends Item {
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
 
-		HumorValue humorous = ((AdvancedComponentHolder)player).getOrDefault(TabulaComponentTypes.HUMOROUS, HumorValue.UNSATISFACTORY);
+		HumorValue humorous = ((MutableComponentHolder)player).getOrDefault(TabulaComponentTypes.HUMOROUS, HumorValue.UNSATISFACTORY);
 		if (player.isSneaking()) {
 			humorous = humorous.next();
-			((AdvancedComponentHolder)player).set(TabulaComponentTypes.HUMOROUS, humorous);
+			((MutableComponentHolder)player).set(TabulaComponentTypes.HUMOROUS, humorous);
 		}
 
 		Text test = Text.of(humorous.asString());

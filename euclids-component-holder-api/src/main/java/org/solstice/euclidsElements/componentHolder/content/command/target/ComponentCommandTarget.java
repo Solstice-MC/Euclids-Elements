@@ -5,13 +5,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
+import org.solstice.euclidsElements.componentHolder.api.MutableComponentHolder;
 
 import java.util.List;
 
-public interface ComponentCommandTarget<T extends AdvancedComponentHolder> {
+public interface ComponentCommandTarget<T extends MutableComponentHolder> {
 
-	static List<ComponentCommandTarget> values() {
+	static List<ComponentCommandTarget<?>> values() {
 		return List.of(ItemTarget.INSTANCE, EntityTarget.INSTANCE, WorldTarget.INSTANCE);
 	}
 

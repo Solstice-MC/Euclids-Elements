@@ -1,4 +1,4 @@
-package org.solstice.euclidsElements.componentHolder.core;
+package org.solstice.euclidsElements.componentHolder;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.component.ComponentMap;
@@ -21,22 +21,23 @@ import org.solstice.euclidsElements.EuclidsElements;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorldComponentsState extends PersistentState {
+public class CustomComponentsState extends PersistentState {
 
-	private static final PersistentState.Type<WorldComponentsState> TYPE =
-		new PersistentState.Type<>(WorldComponentsState::createNew, WorldComponentsState::createFromNbt, null);
+	private static final PersistentState.Type<CustomComponentsState> TYPE =
+		new PersistentState.Type<>(CustomComponentsState::createNew, CustomComponentsState::createFromNbt, null);
 
 	private static final String COMPONENT_ID = EuclidsElements.of("components").toString();
 	private static final Codec<ComponentMap> COMPONENT_CODEC = ComponentMap.CODEC.optionalFieldOf("components", ComponentMap.EMPTY).codec();
 
+	protected ComponentMapImpl serverComponents = new ComponentMapImpl(ComponentMap.EMPTY);
 	protected Map<RegistryKey<World>, ComponentMapImpl> worldComponents = new HashMap<>();
 
 	@Nullable
-	public static WorldComponentsState get(MinecraftServer server) {
+	public static CustomComponentsState get(MinecraftServer server) {
 		ServerWorld world = server.getOverworld();
 		if (world == null) return null;
 
-		WorldComponentsState state = world.getPersistentStateManager().getOrCreate(TYPE, EuclidsElements.of("components").toString());
+		CustomComponentsState state = world.getPersistentStateManager().getOrCreate(TYPE, EuclidsElements.of("components").toString());
 		if (state == null) return null;
 
 		state.markDirty();
@@ -68,14 +69,14 @@ public class WorldComponentsState extends PersistentState {
 		return nbt;
 	}
 
-	public static WorldComponentsState createNew() {
-		WorldComponentsState state = new WorldComponentsState();
+	public static CustomComponentsState createNew() {
+		CustomComponentsState state = new CustomComponentsState();
 		state.worldComponents = new HashMap<>();
 		return state;
 	}
 
-	public static WorldComponentsState createFromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
-		WorldComponentsState state = new WorldComponentsState();
+	public static CustomComponentsState createFromNbt(NbtCompound nbt, RegistryWrapper.WrapperLookup registryLookup) {
+		CustomComponentsState state = new CustomComponentsState();
 		NbtCompound worldComponents = nbt.getCompound("world_components");
 
 		RegistryOps<NbtElement> ops = RegistryOps.of(NbtOps.INSTANCE, registryLookup);

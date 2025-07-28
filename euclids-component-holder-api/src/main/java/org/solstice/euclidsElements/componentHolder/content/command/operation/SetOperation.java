@@ -13,7 +13,7 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
+import org.solstice.euclidsElements.componentHolder.api.MutableComponentHolder;
 import org.solstice.euclidsElements.componentHolder.content.command.target.ComponentCommandTarget;
 
 import static net.minecraft.server.command.CommandManager.argument;
@@ -38,9 +38,9 @@ public class SetOperation implements ComponentCommandOperation {
 	@Override
 	public <T> void executeOperation(
 		CommandContext<ServerCommandSource> context,
-		AdvancedComponentHolder holder,
+		MutableComponentHolder holder,
 		ComponentType<T> component,
-		ComponentCommandTarget<AdvancedComponentHolder> target,
+		ComponentCommandTarget<MutableComponentHolder> target,
 		RegistryOps<NbtElement> registryOps
 	) {
 		NbtElement element = NbtElementArgumentType.getNbtElement(context, "value");

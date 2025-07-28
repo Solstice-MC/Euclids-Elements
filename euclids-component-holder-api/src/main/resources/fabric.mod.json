@@ -13,9 +13,10 @@
 	"accessWidener": "euclids-component-holder-api.accesswidener",
 	"custom": {
 		"loom:injected_interfaces": {
-			"net/minecraft/world/World": [ "org/solstice/euclidsElements/componentHolder/api/AdvancedComponentHolder" ],
-			"net/minecraft/entity/Entity": [ "org/solstice/euclidsElements/componentHolder/api/AdvancedComponentHolder" ],
-			"net/minecraft/item/ItemStack": [ "org/solstice/euclidsElements/componentHolder/api/AdvancedComponentHolder" ]
+			"net/minecraft/server/world/ServerWorld": [ "org/solstice/euclidsElements/componentHolder/api/SerializableComponentHolder" ],
+			"net/minecraft/world/World": [ "org/solstice/euclidsElements/componentHolder/api/SerializableComponentHolder" ],
+			"net/minecraft/entity/Entity": [ "org/solstice/euclidsElements/componentHolder/api/MutableComponentHolder" ],
+			"net/minecraft/item/ItemStack": [ "org/solstice/euclidsElements/componentHolder/api/MutableComponentHolder" ]
 		}
 	},
 
