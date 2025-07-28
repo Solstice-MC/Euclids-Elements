@@ -3,24 +3,22 @@ package org.solstice.euclidsElements.componentHolder.content.command.operation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.argument.NbtElementArgumentType;
 import net.minecraft.command.argument.RegistryKeyArgumentType;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.solstice.euclidsElements.EuclidsElements;
+import net.minecraft.util.Formatting;
 import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
-import org.solstice.euclidsElements.componentHolder.content.command.target.TargetType;
+import org.solstice.euclidsElements.componentHolder.content.command.target.ComponentCommandTarget;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
-public class SetOperation implements OperationType {
+public class SetOperation implements ComponentCommandOperation {
 
 	public static final SetOperation INSTANCE = new SetOperation();
 
@@ -37,31 +35,25 @@ public class SetOperation implements OperationType {
 			);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> int execute(CommandContext<ServerCommandSource> context, TargetType target) throws CommandSyntaxException {
-		AdvancedComponentHolder holder = target.getHolder(context);
-		RegistryEntry<ComponentType<?>> entry = RegistryKeyArgumentType.getRegistryEntry(
-			context,
-			"component_type",
-			RegistryKeys.DATA_COMPONENT_TYPE,
-			INVALID_EXCEPTION
-		);
-		ComponentType<T> component = (ComponentType<T>) entry.value();
-		RegistryOps<NbtElement> ops = RegistryOps.of(NbtOps.INSTANCE, context.getSource().getRegistryManager());
+	public <T> void executeOperation(
+		CommandContext<ServerCommandSource> context,
+		AdvancedComponentHolder holder,
+		ComponentType<T> component,
+		ComponentCommandTarget<AdvancedComponentHolder> target,
+		RegistryOps<NbtElement> registryOps
+	) {
 		NbtElement element = NbtElementArgumentType.getNbtElement(context, "value");
 
-		try {
-			T value = component.getCodecOrThrow().decode(ops, element).getOrThrow().getFirst();
-			holder.set(component, value);
-		} catch (Exception exception) {
-			EuclidsElements.LOGGER.error("whatever", exception.getCause());
-			throw new CommandSyntaxException(FAILED_EXCEPTION, Text.literal(exception.getMessage()));
-		}
-		Text message = Text.translatable("commands.component." + this.getName() + "." + target.getName() + ".success");
-		context.getSource().sendFeedback(() -> message, true);
+		T value = component.getCodecOrThrow().decode(registryOps, element).getOrThrow().getFirst();
+		holder.set(component, value);
 
-		return 1;
+		Text message = Text.translatable("commands.component.set.success",
+			Text.literal(component.toString()).formatted(Formatting.AQUA),
+			target.getTranslation(holder),
+			NbtHelper.toPrettyPrintedText(element)
+		);
+		context.getSource().sendFeedback(() -> message, true);
 	}
 
 }

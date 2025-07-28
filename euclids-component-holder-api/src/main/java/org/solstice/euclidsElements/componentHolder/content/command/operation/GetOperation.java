@@ -3,31 +3,27 @@ package org.solstice.euclidsElements.componentHolder.content.command.operation;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.argument.NbtElementArgumentType;
 import net.minecraft.command.argument.RegistryKeyArgumentType;
 import net.minecraft.component.ComponentType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryOps;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import org.solstice.euclidsElements.EuclidsElements;
 import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
 import org.solstice.euclidsElements.componentHolder.content.command.target.ComponentCommandTarget;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
-public class RemoveOperation implements ComponentCommandOperation {
+public class GetOperation implements ComponentCommandOperation {
 
-	public static final RemoveOperation INSTANCE = new RemoveOperation();
+	public static final GetOperation INSTANCE = new GetOperation();
 
 	@Override
 	public String getName() {
-		return "remove";
+		return "get";
 	}
 
 	@Override
@@ -44,11 +40,11 @@ public class RemoveOperation implements ComponentCommandOperation {
 		ComponentCommandTarget<AdvancedComponentHolder> target,
 		RegistryOps<NbtElement> registryOps
 	) {
-		holder.remove(component);
-
-		Text message = Text.translatable("commands.component.remove.success",
+		NbtElement element = component.getCodecOrThrow().encodeStart(registryOps, holder.get(component)).getOrThrow();
+		Text message = Text.translatable("commands.component.get.success",
+			target.getTranslation(holder),
 			Text.literal(component.toString()).formatted(Formatting.AQUA),
-			target.getTranslation(holder)
+			NbtHelper.toPrettyPrintedText(element)
 		);
 		context.getSource().sendFeedback(() -> message, true);
 	}

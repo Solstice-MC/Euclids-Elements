@@ -7,19 +7,24 @@ import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.ItemSlotArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
-import org.solstice.euclidsElements.componentHolder.api.AdvancedComponentHolder;
 
 import static net.minecraft.server.command.CommandManager.argument;
 
-public class ItemTarget implements TargetType {
+public class ItemTarget implements ComponentCommandTarget<ItemStack> {
 
 	public static final ItemTarget INSTANCE = new ItemTarget();
 
 	@Override
 	public String getName() {
 		return "item";
+	}
+
+	@Override
+	public Text getTranslation(ItemStack stack) {
+		return stack.getName();
 	}
 
 	@Override
@@ -31,7 +36,7 @@ public class ItemTarget implements TargetType {
 	}
 
 	@Override
-	public AdvancedComponentHolder getHolder(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+	public ItemStack getHolder(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
 		Entity entity = EntityArgumentType.getEntity(context, "target");
 		if (!(entity instanceof LivingEntity target)) throw new CommandSyntaxException(EntityArgumentType.NOT_ALLOWED_EXCEPTION, Text.translatable("commands.component.set.item.invalid_target"));
 

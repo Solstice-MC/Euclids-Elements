@@ -10,37 +10,19 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import org.solstice.euclidsElements.content.test.ConstructedRegistryContainer;
 import org.solstice.tabula.Tabula;
 
 import java.util.function.Function;
 
 public class TabulaBlocks {
 
+	protected static final ConstructedRegistryContainer<Block, Block.Settings> CONTAINER = Tabula.REGISTRY.block();
+
 	public static void init() {}
 
-	public static final Block RED_SOUL_SAND = register("red_soul_sand");
-
-	public static Block register(String name) {
-		return register(name, Block::new, AbstractBlock.Settings.create());
-	}
-
-	public static Block register(String name, AbstractBlock.Settings settings) {
-		return register(name, Block::new, settings);
-	}
-
-	public static Block register(String name, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings settings) {
-		return register(name, function, settings, new Item.Settings());
-	}
-
-	public static Block register(String name, Function<AbstractBlock.Settings, Block> function, AbstractBlock.Settings blockSettings, Item.Settings itemSettings) {
-		Identifier id = Tabula.of(name);
-		RegistryKey<Block> blockKey = RegistryKey.of(RegistryKeys.BLOCK, id);
-		Block block = function.apply(blockSettings);
-		Registry.register(Registries.BLOCK, blockKey, block);
-		RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, id);
-		Item item = new BlockItem(block, itemSettings);
-		Registry.register(Registries.ITEM, itemKey, item);
-		return block;
-	}
+	public static final Block PERFECTLY_GENERIC_OBJECT = CONTAINER.register("perfectly_generic_object", Block::new,
+		AbstractBlock.Settings.copy(Blocks.STONE)
+	);
 
 }

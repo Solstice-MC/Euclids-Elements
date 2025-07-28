@@ -7,6 +7,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import org.solstice.euclidsElements.content.test.ConstructedRegistryContainer;
 import org.solstice.euclidsElements.tag.api.MapTagKey;
 import org.solstice.tabula.Tabula;
 import org.solstice.tabula.content.HumorValue;

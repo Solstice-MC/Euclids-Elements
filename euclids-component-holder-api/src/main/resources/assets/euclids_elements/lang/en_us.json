@@ -1,0 +1,13 @@
+{
+	"world.minecraft.overworld": "Overworld",
+	"world.minecraft.the_nether": "Nether",
+	"world.minecraft.the_end": "End",
+
+	"commands.component.remove.success": "Removed %s from %s",
+	"commands.component.set.success": "Set %s on %s to %s",
+	"commands.component.modify.success": "Modified %s on %s to %s",
+	"commands.component.get.success": "%s has the following data for %s: %s",
+
+	"commands.component.failed": "Failed to parse component data: %s",
+	"commands.component.invalid": "test"
+}

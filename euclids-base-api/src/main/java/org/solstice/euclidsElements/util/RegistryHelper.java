@@ -12,7 +12,7 @@ import java.util.Optional;
 public class RegistryHelper {
 
 	@SuppressWarnings("unchecked")
-	public static <T> RegistryEntryList<T> getTagValues (
+	public static <T> RegistryEntryList<T> getTagValues(
 		RegistryWrapper.WrapperLookup lookup,
 		RegistryKey<Registry<T>> registry,
 		TagKey<T> tag
